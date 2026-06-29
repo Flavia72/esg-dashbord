@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piano Controlli — Scadenziario Ambiente & Sicurezza</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#0f1117;--surface:#181c27;--surface2:#1e2335;
+  --border:#2a3050;--border-light:#333d60;
+  --text:#e8ecf5;--text-muted:#8892b0;--text-dim:#556080;
+  --accent:#4f8ef7;--accent-glow:rgba(79,142,247,0.15);
+  --red:#f74f4f;--red-bg:rgba(247,79,79,0.1);--red-border:rgba(247,79,79,0.3);
+  --orange:#f79a4f;--orange-bg:rgba(247,154,79,0.1);--orange-border:rgba(247,154,79,0.3);
+  --blue:#4f8ef7;--blue-bg:rgba(79,142,247,0.1);--blue-border:rgba(79,142,247,0.3);
+  --green:#4fd98e;--green-bg:rgba(79,217,142,0.1);--green-border:rgba(79,217,142,0.3);
+  --gray:#8892b0;--gray-bg:rgba(136,146,176,0.1);--gray-border:rgba(136,146,176,0.3);
+  --purple:#b97fff;--purple-bg:rgba(185,127,255,0.1);--purple-border:rgba(185,127,255,0.3);
+  --teal:#4fd9d9;--teal-bg:rgba(79,217,217,0.1);--teal-border:rgba(79,217,217,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px;}
+.header-left{display:flex;align-items:center;gap:12px;}
+.logo{width:32px;height:32px;background:linear-gradient(135deg,#4f8ef7,#4fd98e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.header-title{font-size:13px;font-weight:600;}
+.header-sub{font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.header-center{display:flex;align-items:center;gap:6px;}
+.header-right{display:flex;align-items:center;gap:6px;}
+
+/* NAV PAGES */
+.nav-pages{display:flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;}
+.nav-page-btn{padding:5px 13px;border-radius:6px;border:none;background:transparent;color:var(--text-muted);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.nav-page-btn.active{background:var(--accent);color:#fff;}
+.nav-page-btn:hover:not(.active){background:var(--surface2);color:var(--text);}
+
+/* YEAR TABS */
+.year-tabs{display:flex;gap:3px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;}
+.year-tab{padding:4px 11px;border-radius:5px;border:none;background:transparent;color:var(--text-muted);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:'JetBrains Mono',monospace;}
+.year-tab.active{background:var(--accent);color:#fff;}
+.year-tab:hover:not(.active){background:var(--surface2);color:var(--text);}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn-primary:hover{background:#6ba3ff;border-color:#6ba3ff;color:#fff;}
+.btn-orange{background:var(--orange-bg);border-color:var(--orange-border);color:var(--orange);}
+.btn-orange:hover{background:var(--orange);color:#fff;}
+.btn-green{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
+.btn-green:hover{background:var(--green);color:#000;}
+.btn-teal{background:var(--teal-bg);border-color:var(--teal-border);color:var(--teal);}
+.btn-teal:hover{background:var(--teal);color:#000;}
+.btn-sm{padding:4px 9px;font-size:11px;border-radius:5px;}
+
+/* PAGES */
+.page{display:none;height:calc(100vh - 57px);}
+.page.active{display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:200px;background:var(--surface);border-right:1px solid var(--border);padding:12px 8px;flex-shrink:0;overflow-y:auto;}
+.sidebar-label{font-size:10px;font-weight:600;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;padding:0 8px;margin-bottom:5px;margin-top:12px;}
+.sidebar-label:first-child{margin-top:0;}
+.nav-item{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;cursor:pointer;transition:all 0.12s;margin-bottom:2px;border:1px solid transparent;}
+.nav-item:hover{background:var(--surface2);}
+.nav-item.active{background:var(--surface2);border-color:var(--border);}
+.nav-item-left{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;}
+.nav-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.nav-dot.red{background:var(--red);}.nav-dot.orange{background:var(--orange);}.nav-dot.blue{background:var(--blue);}.nav-dot.green{background:var(--green);}.nav-dot.gray{background:var(--gray);}.nav-dot.all{background:linear-gradient(135deg,var(--accent),var(--green));}
+.badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;background:var(--surface);color:var(--text-muted);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;}
+.badge.red{background:var(--red-bg);color:var(--red);border-color:var(--red-border);}
+.badge.orange{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-border);}
+.badge.blue{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border);}
+.badge.green{background:var(--green-bg);color:var(--green);border-color:var(--green-border);}
+.badge.gray{background:var(--gray-bg);color:var(--gray);border-color:var(--gray-border);}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:18px 20px;}
+
+/* SUMMARY CARDS */
+.summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.summary-card.red::before{background:var(--red);}.summary-card.orange::before{background:var(--orange);}.summary-card.blue::before{background:var(--blue);}.summary-card.green::before{background:var(--green);}.summary-card.gray::before{background:var(--gray);}
+.summary-card:hover{border-color:var(--border-light);transform:translateY(-1px);}
+.card-label{font-size:11px;color:var(--text-muted);font-weight:500;margin-bottom:5px;}
+.card-count{font-size:26px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.card-count.red{color:var(--red);}.card-count.orange{color:var(--orange);}.card-count.blue{color:var(--blue);}.card-count.green{color:var(--green);}.card-count.gray{color:var(--gray);}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap;}
+.toolbar-left{display:flex;align-items:center;gap:8px;}
+.search-box{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;width:240px;}
+.search-box input{background:transparent;border:none;outline:none;color:var(--text);font-size:12px;width:100%;font-family:'Inter',sans-serif;}
+.search-box input::placeholder{color:var(--text-dim);}
+.section-title{font-size:14px;font-weight:600;}
+
+/* TABLE */
+.table-wrapper{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--surface2);border-bottom:1px solid var(--border);}
+th{padding:8px 11px;text-align:left;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;}
+tr{border-bottom:1px solid var(--border);transition:background 0.1s;}
+tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface2);}
+td{padding:9px 11px;font-size:12px;vertical-align:top;}
+.status-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap;}
+.status-pill.scaduta{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.status-pill.urgente{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border);}
+.status-pill.in_corso{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);}
+.status-pill.completata{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.status-pill.no_scadenza{background:var(--gray-bg);color:var(--gray);border:1px solid var(--gray-border);}
+.law-full{font-size:10px;color:var(--text-muted);line-height:1.4;max-width:160px;}
+.date-cell{font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;}
+.action-btns{display:flex;gap:3px;}
+.icon-btn{width:24px;height:24px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all 0.12s;}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-glow);}
+.icon-btn.has-file{color:var(--green);border-color:var(--green-border);background:var(--green-bg);}
+.norm-tag{display:inline-block;background:var(--accent-glow);color:var(--accent);border:1px solid rgba(79,142,247,0.2);border-radius:4px;padding:1px 5px;font-size:9px;font-family:'JetBrains Mono',monospace;font-weight:500;}
+.freq-text{font-size:10px;color:var(--text-muted);}
+.empty-state{padding:36px;text-align:center;color:var(--text-dim);}
+.empty-icon{font-size:26px;margin-bottom:6px;}
+
+/* ELENCO */
+.elenco-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;}
+.elenco-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.15s;}
+.elenco-card:hover{border-color:var(--border-light);transform:translateY(-1px);}
+.elenco-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.elenco-card-title{font-size:12px;font-weight:600;line-height:1.4;flex:1;}
+.elenco-card-meta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.elenco-card-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:8px;margin-top:4px;}
+.elenco-card-law{font-size:10px;color:var(--text-muted);line-height:1.4;margin-bottom:7px;padding:5px 7px;background:var(--surface2);border-radius:5px;border-left:2px solid var(--accent);}
+.elenco-files-badge{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--green);background:var(--green-bg);border:1px solid var(--green-border);border-radius:20px;padding:1px 7px;}
+.tag-chip{display:inline-block;padding:1px 6px;border-radius:20px;font-size:9px;font-weight:600;}
+.filter-chip{padding:4px 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.12s;}
+.filter-chip.active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow);}
+.filter-chip:hover:not(.active){color:var(--text);}
+
+/* UNITA LOCALE PAGE */
+.ul-page{width:100%;overflow-y:auto;padding:18px 20px;}
+.ul-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.ul-tab{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:12px;cursor:pointer;transition:all 0.12s;font-weight:500;}
+.ul-tab.active{background:var(--purple-bg);border-color:var(--purple-border);color:var(--purple);}
+.ul-tab:hover:not(.active){color:var(--text);}
+.ul-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.ul-section-header{padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ul-section-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.ul-section-badges{display:flex;gap:6px;}
+.ul-summary-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);}
+.ul-stat{text-align:center;}
+.ul-stat-num{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.ul-stat-label{font-size:10px;color:var(--text-muted);}
+.ul-export-bar{padding:10px 16px;display:flex;gap:8px;align-items:center;justify-content:flex-end;border-bottom:1px solid var(--border);}
+.riepilogo-annual{padding:12px 16px;}
+.month-row{display:grid;grid-template-columns:80px repeat(12,1fr);gap:4px;margin-bottom:4px;align-items:center;}
+.month-row.header .month-cell{font-size:9px;font-weight:600;color:var(--text-dim);text-transform:uppercase;text-align:center;}
+.month-cell{font-size:10px;color:var(--text-muted);padding:3px 2px;text-align:center;}
+.month-cell.has-events{background:var(--accent-glow);border:1px solid var(--blue-border);border-radius:4px;color:var(--accent);font-weight:600;cursor:pointer;}
+.month-cell.has-events:hover{background:var(--blue-bg);}
+.month-cell.scaduta-cell{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+.month-cell.urgente-cell{background:var(--orange-bg);border-color:var(--orange-border);color:var(--orange);}
+.month-cell.completata-cell{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
+.aspect-label{font-size:11px;color:var(--text-muted);padding:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* CALENDAR */
+.cal-page-layout{display:flex;flex-direction:column;height:100%;overflow:hidden;width:100%;}
+.cal-controls{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;gap:8px;}
+.cal-nav{display:flex;align-items:center;gap:8px;}
+.cal-month-title{font-size:16px;font-weight:700;min-width:170px;text-align:center;}
+.cal-nav-btn{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+.cal-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.cal-legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.cal-legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-muted);}
+.cal-legend-dot{width:9px;height:9px;border-radius:50%;}
+.cal-body{flex:1;overflow:auto;padding:14px 20px;}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.cal-weekday{text-align:center;font-size:10px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;padding:3px;}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:6px;min-height:88px;transition:all 0.12s;cursor:pointer;}
+.cal-day:hover{border-color:var(--border-light);background:var(--surface2);}
+.cal-day.other-month{background:rgba(24,28,39,0.4);border-color:rgba(42,48,80,0.4);}
+.cal-day.other-month .cal-day-num{color:var(--text-dim);}
+.cal-day.today{border-color:var(--accent);background:var(--accent-glow);}
+.cal-day-num{font-size:12px;font-weight:600;margin-bottom:3px;font-family:'JetBrains Mono',monospace;}
+.cal-day.today .cal-day-num{color:var(--accent);}
+.cal-events{display:flex;flex-direction:column;gap:2px;}
+.cal-event-dot{display:flex;align-items:center;gap:3px;font-size:9px;line-height:1.3;border-radius:3px;padding:1px 4px;cursor:pointer;}
+.cal-event-dot:hover{opacity:0.8;}
+.cal-event-dot.scaduta{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.cal-event-dot.urgente{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border);}
+.cal-event-dot.in_corso{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);}
+.cal-event-dot.completata{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.cal-event-dot.no_scadenza{background:var(--gray-bg);color:var(--gray);border:1px solid var(--gray-border);}
+.cal-event-sym{font-size:9px;flex-shrink:0;}
+.cal-event-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;}
+.cal-more{font-size:8px;color:var(--text-dim);padding:1px 3px;cursor:pointer;text-align:right;}
+.cal-popup{display:none;position:fixed;z-index:150;background:var(--surface);border:1px solid var(--border-light);border-radius:10px;padding:14px;width:290px;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+.cal-popup.open{display:block;}
+.cal-popup-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.cal-popup-title{font-size:12px;font-weight:600;}
+.cal-popup-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:15px;}
+.cal-popup-list{display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto;}
+.cal-popup-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 9px;cursor:pointer;transition:all 0.1s;}
+.cal-popup-item:hover{border-color:var(--accent);}
+.cal-popup-item-title{font-size:11px;font-weight:500;margin-bottom:3px;}
+.cal-popup-item-meta{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+
+/* MODAL BASE */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border-light);border-radius:12px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;}
+.modal-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:14px;font-weight:600;}
+.modal-close{width:26px;height:26px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text-muted);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:16px 20px;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:10px;font-weight:600;color:var(--text-muted);letter-spacing:0.05em;text-transform:uppercase;}
+.form-input,.form-select,.form-textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s;width:100%;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);}
+.form-textarea{resize:vertical;min-height:65px;}
+.form-select option{background:var(--surface);}
+.file-upload-area{border:2px dashed var(--border);border-radius:7px;padding:12px;text-align:center;cursor:pointer;transition:all 0.15s;position:relative;}
+.file-upload-area:hover,.file-upload-area.drag-over{border-color:var(--accent);background:var(--accent-glow);}
+.file-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:20px;margin-bottom:4px;}
+.upload-text{font-size:11px;color:var(--text-muted);}
+.upload-text strong{color:var(--accent);}
+.file-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.file-chip{display:flex;align-items:center;gap:4px;background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);border-radius:20px;padding:2px 9px;font-size:10px;}
+.file-chip button{background:none;border:none;color:var(--green);cursor:pointer;font-size:12px;padding:0;line-height:1;}
+
+/* MAIL MODAL */
+.mail-modal{max-width:600px;}
+.mail-to-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:180px;overflow-y:auto;}
+.mail-to-item{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;}
+.mail-to-item input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;}
+.mail-to-item-label{font-size:12px;flex:1;}
+.mail-add-row{display:flex;gap:6px;margin-bottom:12px;}
+.mail-preview{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;color:var(--text-muted);max-height:200px;overflow-y:auto;white-space:pre-wrap;line-height:1.6;font-family:'JetBrains Mono',monospace;}
+.mail-section-label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
+.deadline-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.deadline-chip{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:11px;cursor:pointer;transition:all 0.12s;}
+.deadline-chip.active{border-color:var(--orange);color:var(--orange);background:var(--orange-bg);}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;right:18px;background:var(--surface2);border:1px solid var(--border-light);border-radius:8px;padding:9px 13px;color:var(--text);font-size:12px;z-index:300;display:flex;align-items:center;gap:7px;opacity:0;transform:translateY(8px);transition:all 0.2s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.error{border-color:var(--red-border);}
+
+/* IMPORT MODAL */
+.import-modal{max-width:520px;}
+.import-drop{border:2px dashed var(--border);border-radius:8px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.15s;position:relative;}
+.import-drop:hover,.import-drop.drag-over{border-color:var(--accent);background:var(--accent-glow);}
+.import-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.import-log{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;color:var(--green);font-family:'JetBrains Mono',monospace;max-height:140px;overflow-y:auto;margin-top:10px;display:none;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo">🛡</div>
+    <div>
+      <div class="header-title">Piano Controlli — Ambiente &amp; Sicurezza</div>
+      <div class="header-sub">ISO 14001 · ISO 45001 · Conformità Legislativa</div>
+    </div>
+  </div>
+  <div class="header-center">
+    <div class="nav-pages">
+      <button class="nav-page-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
+      <button class="nav-page-btn" onclick="showPage('elenco')">📋 Elenco</button>
+      <button class="nav-page-btn" onclick="showPage('unita')">🏭 Unità Locali</button>
+      <button class="nav-page-btn" onclick="showPage('calendario')">📅 Calendario</button>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="year-tabs" id="yearTabs">
+      <button class="year-tab active" onclick="selectYear('2025')">2025</button>
+      <button class="year-tab" onclick="selectYear('2026')">2026</button>
+      <button class="year-tab" onclick="selectYear('2027')">2027</button>
+    </div>
+    <button class="btn btn-teal" onclick="openImportModal()" title="Carica file Excel / JSON o aggiorna dati">⬆ Importa dati</button>
+    <button class="btn btn-orange" onclick="openMailModal()" title="Invia promemoria scadenze via email">✉ Promemoria</button>
+    <button class="btn btn-green" onclick="refreshAll()" title="Aggiorna calcolo stati e contatori">↻ Aggiorna</button>
+    <button class="btn btn-primary" onclick="openAddModal()">＋ Aggiungi</button>
+  </div>
+</div>
+
+<!-- ==================== PAGE: DASHBOARD ==================== -->
+<div class="page active" id="page-dashboard">
+  <div class="sidebar">
+    <div class="sidebar-label">Stato adempimenti</div>
+    <div class="nav-item active" id="nav-all" onclick="setFilter('all')"><div class="nav-item-left"><div class="nav-dot all"></div>Tutti</div><span class="badge" id="badge-all">0</span></div>
+    <div class="nav-item" id="nav-scaduta" onclick="setFilter('scaduta')"><div class="nav-item-left"><div class="nav-dot red"></div>Scaduti</div><span class="badge red" id="badge-scaduta">0</span></div>
+    <div class="nav-item" id="nav-urgente" onclick="setFilter('urgente')"><div class="nav-item-left"><div class="nav-dot orange"></div>Urgenti &lt;15gg</div><span class="badge orange" id="badge-urgente">0</span></div>
+    <div class="nav-item" id="nav-in_corso" onclick="setFilter('in_corso')"><div class="nav-item-left"><div class="nav-dot blue"></div>In corso</div><span class="badge blue" id="badge-in_corso">0</span></div>
+    <div class="nav-item" id="nav-completata" onclick="setFilter('completata')"><div class="nav-item-left"><div class="nav-dot green"></div>Completati</div><span class="badge green" id="badge-completata">0</span></div>
+    <div class="nav-item" id="nav-no_scadenza" onclick="setFilter('no_scadenza')"><div class="nav-item-left"><div class="nav-dot gray"></div>Senza scadenza</div><span class="badge gray" id="badge-no_scadenza">0</span></div>
+    <div class="sidebar-label" style="margin-top:16px">Norma di rif.</div>
+    <div class="nav-item" onclick="setLawFilter('')" id="lawFilter-all"><div class="nav-item-left" style="font-size:11px">Tutte le norme</div></div>
+    <div id="lawFilterList"></div>
+    <div class="sidebar-label" style="margin-top:16px">Sede / Cantiere</div>
+    <div class="nav-item" onclick="setSiteFilter('')" id="siteFilter-all"><div class="nav-item-left" style="font-size:11px">Tutte le sedi</div></div>
+    <div id="siteFilterList"></div>
+  </div>
+  <div class="content">
+    <div class="summary-grid">
+      <div class="summary-card red" onclick="setFilter('scaduta')"><div class="card-label">⚠️ Scaduti</div><div class="card-count red" id="cnt-scaduta">0</div></div>
+      <div class="summary-card orange" onclick="setFilter('urgente')"><div class="card-label">🔔 Urgenti &lt;15 gg</div><div class="card-count orange" id="cnt-urgente">0</div></div>
+      <div class="summary-card blue" onclick="setFilter('in_corso')"><div class="card-label">🔄 In corso</div><div class="card-count blue" id="cnt-in_corso">0</div></div>
+      <div class="summary-card green" onclick="setFilter('completata')"><div class="card-label">✅ Completati</div><div class="card-count green" id="cnt-completata">0</div></div>
+      <div class="summary-card gray" onclick="setFilter('no_scadenza')"><div class="card-label">♾ Senza scadenza</div><div class="card-count gray" id="cnt-no_scadenza">0</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="toolbar-left"><div class="section-title" id="sectionTitle">Tutti gli adempimenti</div></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div class="search-box"><span style="color:var(--text-dim);font-size:13px">🔍</span><input type="text" placeholder="Cerca attività, norma, responsabile..." id="searchInput" oninput="renderTable()"></div>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr>
+          <th style="width:70px">Norma</th><th style="width:110px">Aspetto</th>
+          <th>Attività / Controllo</th><th style="width:160px">Rif. Legislativo</th>
+          <th style="width:80px">Frequenza</th><th style="width:105px">Scadenza</th>
+          <th style="width:76px">Stato</th><th style="width:55px">Sede</th>
+          <th style="width:70px">Resp.</th><th style="width:68px">Evidenze</th>
+          <th style="width:64px">Azioni</th>
+        </tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none"><div class="empty-icon">📋</div><div>Nessun adempimento trovato</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: ELENCO ==================== -->
+<div class="page" id="page-elenco">
+  <div class="content" style="width:100%">
+    <div class="toolbar" style="margin-bottom:10px">
+      <div class="section-title">📋 Elenco Adempimenti — <span id="elenco-year-label">2025</span></div>
+      <div style="display:flex;gap:6px"><div class="search-box"><span style="color:var(--text-dim)">🔍</span><input type="text" placeholder="Cerca..." id="elencoSearch" oninput="renderElenco()"></div></div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="elencoFilters">
+      <span class="filter-chip active" onclick="setElencoFilter('all',this)">Tutti</span>
+      <span class="filter-chip" onclick="setElencoFilter('scaduta',this)">⚠️ Scaduti</span>
+      <span class="filter-chip" onclick="setElencoFilter('urgente',this)">🔔 Urgenti</span>
+      <span class="filter-chip" onclick="setElencoFilter('in_corso',this)">🔄 In corso</span>
+      <span class="filter-chip" onclick="setElencoFilter('completata',this)">✅ Completati</span>
+      <span class="filter-chip" onclick="setElencoFilter('no_scadenza',this)">♾ Senza scad.</span>
+    </div>
+    <div class="elenco-grid" id="elencoGrid"></div>
+    <div class="empty-state" id="elencoEmpty" style="display:none"><div class="empty-icon">📋</div><div>Nessun adempimento trovato</div></div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: UNITÀ LOCALI ==================== -->
+<div class="page" id="page-unita">
+  <div class="ul-page" style="width:100%">
+    <div class="toolbar" style="margin-bottom:14px">
+      <div class="section-title">🏭 Riepilogo per Unità Locale — <span id="ul-year-label">2025</span></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm btn-green" onclick="exportULReport()">📥 Esporta riepilogo</button>
+        <button class="btn btn-sm btn-orange" onclick="openMailModal()">✉ Invia promemoria</button>
+      </div>
+    </div>
+    <div class="ul-tabs" id="ulTabs"></div>
+    <div id="ulContent"></div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: CALENDARIO ==================== -->
+<div class="page" id="page-calendario">
+  <div class="cal-page-layout">
+    <div class="cal-controls">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+        <div class="cal-month-title" id="calMonthTitle">Giugno 2025</div>
+        <button class="cal-nav-btn" onclick="calNext()">›</button>
+        <button class="btn btn-sm" onclick="calGoToday()">Oggi</button>
+      </div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--red)"></div>Scaduto</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--orange)"></div>Urgente</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--blue)"></div>In corso</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green)"></div>Completato</div>
+      </div>
+    </div>
+    <div class="cal-body">
+      <div class="cal-weekdays">
+        <div class="cal-weekday">Lun</div><div class="cal-weekday">Mar</div><div class="cal-weekday">Mer</div>
+        <div class="cal-weekday">Gio</div><div class="cal-weekday">Ven</div><div class="cal-weekday">Sab</div><div class="cal-weekday">Dom</div>
+      </div>
+      <div class="cal-days" id="calDays"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CAL POPUP -->
+<div class="cal-popup" id="calPopup">
+  <div class="cal-popup-header"><div class="cal-popup-title" id="calPopupTitle"></div><button class="cal-popup-close" onclick="closeCalPopup()">✕</button></div>
+  <div class="cal-popup-list" id="calPopupList"></div>
+</div>
+
+<!-- MODAL: ADD/EDIT -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modalTitle">Adempimento</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Rif. Normativa</label><input type="text" class="form-input" id="f_rifNorm" placeholder="es. 6A"></div>
+        <div class="form-group"><label class="form-label">Anno</label><input type="text" class="form-input" id="f_anno"></div>
+        <div class="form-group"><label class="form-label">Aspetto Ambiente/Sicurezza</label><input type="text" class="form-input" id="f_aspetto" placeholder="es. Rifiuti"></div>
+        <div class="form-group"><label class="form-label">Unità Locale / Sede</label><input type="text" class="form-input" id="f_sede" placeholder="Sede principale, Cantiere Milano..."></div>
+        <div class="form-group full"><label class="form-label">Autorizzazione / Controllo</label><input type="text" class="form-input" id="f_controllo" placeholder="Descrizione attività"></div>
+        <div class="form-group full"><label class="form-label">Riferimento Limiti di Legge</label><textarea class="form-textarea" id="f_legge" placeholder="D.lgs 81/08, DM 16.02.1982..."></textarea></div>
+        <div class="form-group"><label class="form-label">Frequenza</label><input type="text" class="form-input" id="f_freq" placeholder="Annuale, Semestrale..."></div>
+        <div class="form-group"><label class="form-label">Prossima Scadenza</label><input type="date" class="form-input" id="f_scadenza"></div>
+        <div class="form-group"><label class="form-label">Stato</label>
+          <select class="form-select" id="f_stato">
+            <option value="in_corso">In corso</option><option value="completata">Completata</option>
+            <option value="scaduta">Scaduta</option><option value="no_scadenza">Senza scadenza</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Responsabile</label><input type="text" class="form-input" id="f_resp" value="RSPP"></div>
+        <div class="form-group full"><label class="form-label">Rif. Documento</label><input type="text" class="form-input" id="f_doc" placeholder="es. Verbale di verifica"></div>
+        <div class="form-group full"><label class="form-label">Archiviazione</label><input type="text" class="form-input" id="f_arch" placeholder="Cartacea / Gestionale..."></div>
+        <div class="form-group full"><label class="form-label">Note</label><textarea class="form-textarea" id="f_note" placeholder="Note aggiuntive..."></textarea></div>
+        <div class="form-group full">
+          <label class="form-label">📎 Evidenze — PDF o JPEG (ISO 14001 / 45001)</label>
+          <div class="file-upload-area" id="dropZone">
+            <input type="file" id="f_files" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="handleFiles(this.files)">
+            <div class="upload-icon">📄</div>
+            <div class="upload-text"><strong>Trascina qui</strong> i file oppure clicca<br><span style="font-size:9px;color:var(--text-dim)">PDF, JPG, JPEG — max 10MB per file</span></div>
+            <div class="file-chips" id="fileChips"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" onclick="saveRecord()">💾 Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: IMPORT -->
+<div class="modal-overlay" id="importModalOverlay">
+  <div class="modal import-modal">
+    <div class="modal-header"><div class="modal-title">⬆ Importa / Aggiorna dati</div><button class="modal-close" onclick="closeImportModal()">✕</button></div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px;font-size:12px;color:var(--text-muted);line-height:1.6">
+        Puoi importare adempimenti da un file <strong style="color:var(--text)">JSON</strong> esportato in precedenza, oppure incollare dati tabulari.<br>
+        Gli adempimenti esistenti con lo stesso ID verranno aggiornati; i nuovi verranno aggiunti.
+      </div>
+      <div class="import-drop" id="importDrop">
+        <input type="file" id="importFile" accept=".json,.txt" onchange="handleImportFile(this.files)">
+        <div class="upload-icon">📂</div>
+        <div class="upload-text"><strong>Trascina qui un file JSON</strong> oppure clicca per sfogliare</div>
+      </div>
+      <div class="import-log" id="importLog"></div>
+      <div style="margin-top:14px">
+        <div class="mail-section-label" style="margin-bottom:8px">Oppure incolla JSON / dati strutturati</div>
+        <textarea class="form-textarea" id="importPaste" style="min-height:80px;font-family:'JetBrains Mono',monospace;font-size:11px" placeholder='[{"id":99,"rifNorm":"10","aspetto":"Rifiuti","controllo":"...", ...}]'></textarea>
+      </div>
+      <div style="margin-top:14px;padding:10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+        <div class="mail-section-label" style="margin-bottom:6px">Esporta dati attuali</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-green" onclick="exportJSON()">📥 Esporta tutti gli anni (JSON)</button>
+          <button class="btn btn-sm" onclick="exportYearJSON()">📥 Esporta anno corrente (JSON)</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeImportModal()">Chiudi</button>
+      <button class="btn btn-primary" onclick="processImport()">✅ Importa adempimenti</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MAIL -->
+<div class="modal-overlay" id="mailModalOverlay">
+  <div class="modal mail-modal">
+    <div class="modal-header"><div class="modal-title">✉ Promemoria Scadenze via Email</div><button class="modal-close" onclick="closeMailModal()">✕</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <!-- LEFT: Recipients -->
+        <div>
+          <div class="mail-section-label">Destinatari</div>
+          <div class="mail-to-list" id="mailToList"></div>
+          <div class="mail-add-row">
+            <input type="email" class="form-input" id="newMailAddr" placeholder="nuova@email.it" style="flex:1">
+            <button class="btn btn-sm btn-primary" onclick="addMailRecipient()">＋</button>
+          </div>
+        </div>
+        <!-- RIGHT: Options -->
+        <div>
+          <div class="mail-section-label" style="margin-bottom:6px">Includi adempimenti</div>
+          <div class="deadline-chips">
+            <span class="deadline-chip active" data-filter="scaduta" onclick="toggleDeadlineChip(this)">⚠️ Scaduti</span>
+            <span class="deadline-chip active" data-filter="urgente" onclick="toggleDeadlineChip(this)">🔔 Urgenti</span>
+            <span class="deadline-chip" data-filter="in_corso" onclick="toggleDeadlineChip(this)">🔄 In corso</span>
+          </div>
+          <div class="mail-section-label" style="margin-bottom:6px;margin-top:10px">Oggetto email</div>
+          <input type="text" class="form-input" id="mailSubject" value="[ISO 14001/45001] Promemoria scadenze adempimenti">
+          <div style="margin-top:10px">
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;color:var(--text-muted)">
+              <input type="checkbox" id="mailIncludeYear" checked style="accent-color:var(--accent)">
+              Includi solo anno corrente (<span id="mailYearLabel">2025</span>)
+            </label>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div class="mail-section-label">Anteprima messaggio</div>
+          <button class="btn btn-sm" onclick="refreshMailPreview()">↻ Aggiorna</button>
+        </div>
+        <div class="mail-preview" id="mailPreview"></div>
+      </div>
+      <div style="margin-top:10px;padding:8px 10px;background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:6px;font-size:11px;color:var(--orange)">
+        ℹ️ Il tasto <strong>Invia</strong> aprirà il tuo client email predefinito con il messaggio precompilato. Per invio automatico è necessaria un'integrazione con un server SMTP esterno.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeMailModal()">Chiudi</button>
+      <button class="btn btn-sm btn-green" onclick="copyMailBody()">📋 Copia testo</button>
+      <button class="btn btn-primary" onclick="sendMail()">📨 Apri in client email</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Salvato</div>
+
+<script>
+// ==================== DATASET ====================
+const BASE_DATA_2025=[
+  {id:1,rifNorm:"1AS",aspetto:"Edilizia",sede:"Sede principale",controllo:"Certificato di abitabilità dell'immobile",legge:"Licenza edilizia; D.Lgs. 192/2005 rendimento energetico; D.P.R. 59/2009",freq:"n.a.",scadenza:null,doc:"Certificato abitabilità",arch:"Cartacea e scannerizzata",resp:"RSPP",stato:"no_scadenza",note:"",files:[]},
+  {id:2,rifNorm:"5A",aspetto:"Approvvigionamento Idrico",sede:"Sede principale",controllo:"Verifica ricevimento bolletta consumo acqua e relativo pagamento",legge:"Contratto fornitura acquedotto e pagamento canone",freq:"Semestrale",scadenza:null,doc:"Bollette",arch:"Cartacea e scannerizzata",resp:"RSPP",stato:"no_scadenza",note:"Giugno / Dicembre",files:[]},
+  {id:3,rifNorm:"5A",aspetto:"Approvvigionamento Idrico",sede:"Sede principale",controllo:"Contratto di fornitura acqua",legge:"",freq:"n.a.",scadenza:null,doc:"Contratto",arch:"",resp:"RSPP",stato:"no_scadenza",note:"",files:[]},
+  {id:4,rifNorm:"5S",aspetto:"DVR",sede:"Sede principale",controllo:"Verifica adempimenti DVR previsti",legge:"D.lgs 81/08",freq:"Annuale",scadenza:null,doc:"Documento di valutazione",arch:"Cartacea ufficio",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:5,rifNorm:"5S",aspetto:"DVR",sede:"Sede principale",controllo:"Scadenze DVR specifici: ATEX, CEM, Elettrico, Incendio, ROA, RON, Ionizzanti, Rumore, Vibrazioni, VDT, MMC",legge:"D.lgs 81/08",freq:"Quadriennale",scadenza:null,doc:"Documento di valutazione",arch:"Cartacea ufficio",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:6,rifNorm:"5S",aspetto:"DVR",sede:"Sede principale",controllo:"Scadenza DVR specifici: Biologico, Chimico, Cancerogeno, Confinati, Madri",legge:"D.lgs 81/08",freq:"Triennale",scadenza:null,doc:"Documento di valutazione",arch:"Cartacea ufficio",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:7,rifNorm:"5S",aspetto:"DVR",sede:"Sede principale",controllo:"Scadenza DVR specifici: Stress Lavoro Correlato",legge:"D.lgs 81/08",freq:"Biennale",scadenza:null,doc:"Documento di valutazione",arch:"Cartacea ufficio",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:8,rifNorm:"6A",aspetto:"Scarichi idrici",sede:"Sede principale",controllo:"Concessione Regione Emilia Romagna prat. 3535/S MOPPA 3305",legge:"Art 34 - Regolamento Regionale n.41/2001",freq:"Decennale",scadenza:"2025-05-01",doc:"Attestati",arch:"",resp:"RSPP",stato:"scaduta",note:"",files:[]},
+  {id:9,rifNorm:"6A",aspetto:"Scarichi idrici",sede:"Sede principale",controllo:"Richiesta rinnovo concessione scarichi",legge:"Art 124 - D.lgs 156/06 e smi",freq:"Decennale",scadenza:"2024-11-01",doc:"Domanda rinnovo",arch:"",resp:"RSPP",stato:"scaduta",note:"",files:[]},
+  {id:10,rifNorm:"6A",aspetto:"Scarichi idrici",sede:"Sede principale",controllo:"Comunicazione quantitativo scarichi annuale",legge:"Artt. 124 e 101 - D.lgs 156/06 e smi",freq:"Annuale",scadenza:"2025-12-01",doc:"Invio PEC dicembre",arch:"",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:11,rifNorm:"6A",aspetto:"Scarichi idrici",sede:"Cantiere",controllo:"Analisi acque meteoriche",legge:"Artt. 124 e 101 - D.lgs 156/06 e smi",freq:"Quinquennale",scadenza:"2027-12-01",doc:"Report analitico laboratorio",arch:"Cartacea",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:12,rifNorm:"6S",aspetto:"Rumore interno",sede:"Cantiere",controllo:"Analisi fonometrica interna",legge:"D.lgs 81/08",freq:"Ogni 4 anni",scadenza:"2027-11-01",doc:"Relazione fonometrica",arch:"Cartacea",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:13,rifNorm:"10",aspetto:"Rifiuti",sede:"Sede principale",controllo:"Verifica autorizzazioni ditte di trasporto e smaltitori",legge:"D.lgs 152/06",freq:"Ad ogni nuovo inserimento",scadenza:null,doc:"Gestionale rifiuti",arch:"Autorizzazioni cartacee",resp:"RSPP",stato:"no_scadenza",note:"In automatico",files:[]},
+  {id:14,rifNorm:"10",aspetto:"Rifiuti",sede:"Sede principale",controllo:"Registro carico/scarico rifiuti",legge:"D.lgs 152/06",freq:"Ogni 10 gg. + 4° copia FIR entro 3 mesi",scadenza:null,doc:"Registro RCS vidimato Camera di Commercio",arch:"Cartacea",resp:"RSPP",stato:"no_scadenza",note:"Se prodotti rifiuti pericolosi",files:[]},
+  {id:15,rifNorm:"10",aspetto:"Rifiuti",sede:"Sede principale",controllo:"Presentazione MUD (dichiarazione rifiuti)",legge:"D.lgs 152/06",freq:"Annuale",scadenza:"2025-04-30",doc:"Gestionale rifiuti",arch:"Cartacea",resp:"RSPP",stato:"scaduta",note:"30/04 salvo proroghe",files:[]},
+  {id:16,rifNorm:"16A",aspetto:"Incendio",sede:"Sede principale",controllo:"Certificato prevenzione incendi (CPI)",legge:"DM 16.02.1982 e DPR 151/2011",freq:"Ogni 5 anni",scadenza:"2027-08-01",doc:"Certificato VVF",arch:"Cartacea ufficio RSPP",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:17,rifNorm:"16A",aspetto:"Incendio",sede:"Sede principale",controllo:"Controlli semestrali e tenuta registro controlli antincendio",legge:"DPR 37/98 e DPR 151/01",freq:"Semestrale",scadenza:null,doc:"Registro antincendio",arch:"Cartacea ufficio RSPP",resp:"RSPP",stato:"no_scadenza",note:"",files:[]},
+  {id:18,rifNorm:"16A",aspetto:"Incendio",sede:"Sede principale",controllo:"Prova evacuazione + Prova simulazione ambientale",legge:"DM 10.03.98",freq:"Annuale",scadenza:"2025-09-01",doc:"Registro antincendio",arch:"Cartacea ufficio RSPP",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:19,rifNorm:"16A",aspetto:"Incendio",sede:"Sede principale",controllo:"Formazione squadra antincendio",legge:"DM 10.03.98",freq:"Triennale",scadenza:null,doc:"Attestati",arch:"Cartacea ufficio RSPP",resp:"RSPP",stato:"no_scadenza",note:"",files:[]},
+  {id:20,rifNorm:"14A",aspetto:"Inquinamento del suolo",sede:"Sede principale",controllo:"Verifica tenuta serbatoi interrati olio e gasolio",legge:"D.lgs 152/06 e ISO 14001:2015",freq:"Annuale",scadenza:"2025-12-31",doc:"Rapporto di verifica interna",arch:"Cartacea ufficio direzione",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:21,rifNorm:"15S",aspetto:"Impianto elettrico",sede:"Sede principale",controllo:"Controllo messa a terra e ATEX",legge:"DPR 462/01",freq:"Biennale",scadenza:null,doc:"Verbale di verifica",arch:"Cartacea ufficio direzione",resp:"RSPP",stato:"no_scadenza",note:"",files:[]},
+  {id:22,rifNorm:"15S",aspetto:"Impianto elettrico",sede:"Cantiere",controllo:"Verifiche impianti elettrici",legge:"D.lgs 81/08",freq:"Annuale",scadenza:"2026-06-01",doc:"Verbale di verifica",arch:"Cartacea ufficio direzione",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:23,rifNorm:"18A",aspetto:"Schede di sicurezza",sede:"Sede principale",controllo:"Verifica presenza schede di sicurezza",legge:"D.lgs 81/08",freq:"Ad ogni nuovo inserimento",scadenza:null,doc:"Scheda di sicurezza",arch:"Cartacea ufficio",resp:"RSPP",stato:"no_scadenza",note:"N.A. in automatico",files:[]},
+  {id:24,rifNorm:"19A",aspetto:"Gas effetto serra",sede:"Sede principale",controllo:"Controlli annuali assenza fughe pompa di calore R407C kg 8",legge:"Reg 842/2006 e Reg 1516/2007",freq:"Annuale",scadenza:"2025-07-01",doc:"Libretto impianto",arch:"Cartacea e scannerizzata in Gestionale Gamma",resp:"RSPP",stato:"scaduta",note:"",files:[]},
+  {id:25,rifNorm:"21A",aspetto:"Rumore esterno",sede:"Sede principale",controllo:"Monitoraggio clima acustico ambientale",legge:"L. 447/95 e DGR 673/04",freq:"Quinquennale o per modifiche rilevanti",scadenza:"2025-11-01",doc:"Relazione fonometrica",arch:"Cartacea e scannerizzata in Gestionale Gamma",resp:"RSPP",stato:"urgente",note:"",files:[]},
+  {id:26,rifNorm:"ISO",aspetto:"Sversamenti",sede:"Sede principale",controllo:"Verifica presenza materiale assorbente nei luoghi di rischio + tappetini per caditoie",legge:"ISO 14001:2015",freq:"Semestrale",scadenza:null,doc:"Piano di emergenza",arch:"n.a.",resp:"RSPP",stato:"no_scadenza",note:"",files:[]},
+  {id:27,rifNorm:"ISO",aspetto:"Leggi",sede:"Sede principale",controllo:"Controllo conformità normativa",legge:"ISO 14001:2015",freq:"Annuale",scadenza:"2025-12-31",doc:"Database leggi + check list",arch:"Cartacea ufficio direzione",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+  {id:28,rifNorm:"ISO",aspetto:"Rifiuti",sede:"Cantiere",controllo:"Presenza procedura di gestione rifiuti in cantiere",legge:"ISO 14001:2015",freq:"Annuale",scadenza:null,doc:"Procedura gestione rifiuti, rapporto audit interno",arch:"Cartacea ufficio RSPP",resp:"RSPP",stato:"no_scadenza",note:"",files:[]},
+  {id:29,rifNorm:"ISO",aspetto:"Sorveglianza Sanitaria",sede:"Sede principale",controllo:"Protocollo Sanitario, Relazione Annuale, Sopralluogo, Riunione periodica",legge:"D.lgs 81/08",freq:"Annuale",scadenza:"2025-03-01",doc:"Documenti Medico Competente",arch:"Cartacea ufficio RSPP",resp:"RSPP",stato:"scaduta",note:"",files:[]},
+  {id:30,rifNorm:"ISO",aspetto:"DPI",sede:"Sede principale",controllo:"Consegna annuale DPI",legge:"D.lgs 81/08",freq:"Annuale",scadenza:"2025-05-01",doc:"Verbale consegna DPI",arch:"Cartacea ufficio RSPP",resp:"RSPP",stato:"scaduta",note:"",files:[]},
+  {id:31,rifNorm:"ISO",aspetto:"Impianto distribuzione carburanti",sede:"Sede principale",controllo:"Verifica erogatori impianto carburanti",legge:"Art. 4 del DM 182/2000",freq:"Biennale",scadenza:"2026-12-01",doc:"Libretti metrologici",arch:"Cartacea Cedem",resp:"RSPP",stato:"in_corso",note:"",files:[]},
+];
+
+// ==================== STATE ====================
+let allData={};
+let currentYear='2025';
+let currentFilter='all';
+let currentLawFilter='';
+let currentSiteFilter='';
+let elencoFilter='all';
+let editingId=null;
+let pendingFiles=[];
+let calYear=2025;
+let calMonth=5;
+let currentPage='dashboard';
+let currentULSite='';
+let mailRecipients=[];
+let mailDeadlineFilters=['scaduta','urgente'];
+
+const STATUS_SYM={scaduta:'⚠️',urgente:'🔔',in_corso:'🔵',completata:'✅',no_scadenza:'⚪'};
+const STATUS_LABEL={scaduta:'Scaduta',urgente:'Urgente',in_corso:'In corso',completata:'Completata',no_scadenza:'Senza scad.'};
+const MONTHS_IT=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const MONTHS_SHORT=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+
+// ==================== INIT ====================
+function initData(){
+  try{const r=localStorage.getItem('scadenziario_v4');if(r){allData=JSON.parse(r);return;}}catch(e){}
+  allData['2025']=JSON.parse(JSON.stringify(BASE_DATA_2025));
+  allData['2026']=[];allData['2027']=[];
+  saveToStorage();
+}
+function saveToStorage(){try{localStorage.setItem('scadenziario_v4',JSON.stringify(allData));}catch(e){}}
+function getData(){return allData[currentYear]||[];}
+function getAllSites(){
+  const sites=new Set();
+  Object.values(allData).flat().forEach(r=>{if(r.sede&&r.sede.trim())sites.add(r.sede.trim());});
+  return [...sites].sort();
+}
+
+// ==================== PAGES ====================
+function showPage(p){
+  currentPage=p;
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-page-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const btns=document.querySelectorAll('.nav-page-btn');
+  const map={dashboard:0,elenco:1,unita:2,calendario:3};
+  if(btns[map[p]])btns[map[p]].classList.add('active');
+  if(p==='elenco'){document.getElementById('elenco-year-label').textContent=currentYear;renderElenco();}
+  if(p==='unita'){document.getElementById('ul-year-label').textContent=currentYear;renderUL();}
+  if(p==='calendario')renderCalendar();
+}
+
+// ==================== STATUS ====================
+function computeStatus(row){
+  if(row.stato==='completata')return 'completata';
+  if(!row.scadenza){return row.stato==='in_corso'?'in_corso':'no_scadenza';}
+  const today=new Date();today.setHours(0,0,0,0);
+  const due=new Date(row.scadenza);
+  const diff=Math.floor((due-today)/86400000);
+  if(diff<0)return 'scaduta';
+  if(diff<=15)return 'urgente';
+  return 'in_corso';
+}
+
+// ==================== REFRESH ====================
+function refreshAll(){
+  updateCounts();
+  if(currentPage==='dashboard')renderTable();
+  if(currentPage==='elenco')renderElenco();
+  if(currentPage==='unita')renderUL();
+  if(currentPage==='calendario')renderCalendar();
+  showToast('↻ Dati aggiornati — '+new Date().toLocaleTimeString('it-IT'));
+}
+
+// ==================== YEAR / FILTER ====================
+function selectYear(y){
+  currentYear=y;calYear=parseInt(y);
+  document.querySelectorAll('.year-tab').forEach(t=>t.classList.toggle('active',t.textContent===y));
+  document.getElementById('mailYearLabel').textContent=y;
+  refreshAll();
+  if(document.getElementById('elenco-year-label'))document.getElementById('elenco-year-label').textContent=y;
+  if(document.getElementById('ul-year-label'))document.getElementById('ul-year-label').textContent=y;
+}
+function setFilter(f){
+  currentFilter=f;
+  document.querySelectorAll('#page-dashboard .nav-item').forEach(el=>el.classList.remove('active'));
+  const e=document.getElementById('nav-'+f);if(e)e.classList.add('active');
+  const titles={all:'Tutti gli adempimenti',scaduta:'⚠️ Adempimenti scaduti',urgente:'🔔 Urgenti — entro 15 giorni',in_corso:'🔄 In corso di gestione',completata:'✅ Completati',no_scadenza:'♾ Senza scadenza definita'};
+  document.getElementById('sectionTitle').textContent=titles[f]||'Adempimenti';
+  renderTable();
+}
+function setLawFilter(law){currentLawFilter=law;renderTable();}
+function setSiteFilter(site){currentSiteFilter=site;renderTable();}
+function setElencoFilter(f,el){elencoFilter=f;document.querySelectorAll('#elencoFilters .filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderElenco();}
+
+// ==================== COUNTS ====================
+function updateCounts(){
+  const data=getData();
+  const counts={scaduta:0,urgente:0,in_corso:0,completata:0,no_scadenza:0};
+  data.forEach(r=>{counts[computeStatus(r)]++;});
+  ['scaduta','urgente','in_corso','completata','no_scadenza'].forEach(k=>{
+    const ce=document.getElementById('cnt-'+k);if(ce)ce.textContent=counts[k];
+    const be=document.getElementById('badge-'+k);if(be)be.textContent=counts[k];
+  });
+  const ba=document.getElementById('badge-all');if(ba)ba.textContent=data.length;
+  // Law filters
+  const laws={};data.forEach(r=>{if(r.rifNorm)laws[r.rifNorm]=(laws[r.rifNorm]||0)+1;});
+  const lc=document.getElementById('lawFilterList');
+  if(lc)lc.innerHTML=Object.entries(laws).map(([k,v])=>`<div class="nav-item" onclick="setLawFilter('${k}')"><div class="nav-item-left" style="font-size:11px"><span class="norm-tag">${esc(k)}</span></div><span class="badge" style="font-size:9px">${v}</span></div>`).join('');
+  // Site filters
+  const sites={};data.forEach(r=>{const s=(r.sede||'').trim();if(s)sites[s]=(sites[s]||0)+1;});
+  const sc=document.getElementById('siteFilterList');
+  if(sc)sc.innerHTML=Object.entries(sites).map(([k,v])=>`<div class="nav-item" onclick="setSiteFilter('${k}')"><div class="nav-item-left" style="font-size:11px;gap:4px">🏭 ${esc(k.substring(0,18))}</div><span class="badge" style="font-size:9px">${v}</span></div>`).join('');
+}
+
+// ==================== TABLE ====================
+function renderTable(){
+  updateCounts();
+  const data=getData();
+  const q=((document.getElementById('searchInput')||{}).value||'').toLowerCase();
+  const filtered=data.filter(r=>{
+    const s=computeStatus(r);
+    return(currentFilter==='all'||s===currentFilter)&&(!currentLawFilter||r.rifNorm===currentLawFilter)&&(!currentSiteFilter||r.sede===currentSiteFilter)&&(!q||[r.controllo,r.aspetto,r.legge,r.rifNorm,r.resp,r.note,r.sede].some(v=>v&&v.toLowerCase().includes(q)));
+  });
+  const tbody=document.getElementById('tableBody');
+  const empty=document.getElementById('emptyState');
+  if(!tbody)return;
+  if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const order={scaduta:0,urgente:1,in_corso:2,no_scadenza:3,completata:4};
+  filtered.sort((a,b)=>{const sa=computeStatus(a),sb=computeStatus(b);if(order[sa]!==order[sb])return order[sa]-order[sb];if(a.scadenza&&b.scadenza)return new Date(a.scadenza)-new Date(b.scadenza);return 0;});
+  tbody.innerHTML=filtered.map(r=>{
+    const s=computeStatus(r);
+    const lawShort=r.legge?(r.legge.substring(0,40)+(r.legge.length>40?'…':'')):('—');
+    const filesHtml=r.files&&r.files.length?`<button class="icon-btn has-file" title="${r.files.map(f=>f.name).join(', ')}" onclick="viewFiles(${r.id})">📎 ${r.files.length}</button>`:`<button class="icon-btn" title="Aggiungi evidenza" onclick="openEditModal(${r.id},true)">📎</button>`;
+    return`<tr><td><span class="norm-tag">${esc(r.rifNorm||'—')}</span></td><td style="font-size:11px;font-weight:500">${esc(r.aspetto||'')}</td><td><div style="font-size:12px;line-height:1.4">${esc(r.controllo)}</div>${r.note?`<div style="font-size:10px;color:var(--text-dim);margin-top:1px">${esc(r.note)}</div>`:''}</td><td><div class="law-full" title="${esc(r.legge||'')}">${esc(lawShort)}</div></td><td><div class="freq-text">${esc(r.freq||'—')}</div></td><td>${fmtDate(r.scadenza)}</td><td><span class="status-pill ${s}">${STATUS_LABEL[s]}</span></td><td style="font-size:11px;color:var(--text-muted)">${esc(r.sede||'—')}</td><td style="font-size:11px">${esc(r.resp||'—')}</td><td>${filesHtml}</td><td><div class="action-btns"><button class="icon-btn" title="Modifica" onclick="openEditModal(${r.id})">✏️</button><button class="icon-btn" title="Elimina" onclick="deleteRecord(${r.id})">🗑</button></div></td></tr>`;
+  }).join('');
+}
+
+// ==================== ELENCO ====================
+function renderElenco(){
+  const data=getData();
+  const q=((document.getElementById('elencoSearch')||{}).value||'').toLowerCase();
+  const filtered=data.filter(r=>{
+    const s=computeStatus(r);
+    return(elencoFilter==='all'||s===elencoFilter)&&(!q||[r.controllo,r.aspetto,r.legge,r.rifNorm,r.resp,r.note,r.sede].some(v=>v&&v.toLowerCase().includes(q)));
+  });
+  const order={scaduta:0,urgente:1,in_corso:2,no_scadenza:3,completata:4};
+  filtered.sort((a,b)=>{const sa=computeStatus(a),sb=computeStatus(b);if(order[sa]!==order[sb])return order[sa]-order[sb];if(a.scadenza&&b.scadenza)return new Date(a.scadenza)-new Date(b.scadenza);return 0;});
+  const grid=document.getElementById('elencoGrid');
+  const empty=document.getElementById('elencoEmpty');
+  if(!filtered.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=filtered.map(r=>{
+    const s=computeStatus(r);
+    const filesHtml=r.files&&r.files.length?`<div class="elenco-files-badge">📎 ${r.files.length} evidenz${r.files.length>1?'e':'a'}</div>`:'';
+    const dateStr=r.scadenza?new Date(r.scadenza).toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}):'—';
+    return`<div class="elenco-card" onclick="openEditModal(${r.id})">
+      <div class="elenco-card-top"><div class="elenco-card-title">${esc(r.controllo)}</div><span class="status-pill ${s}" style="flex-shrink:0">${STATUS_SYM[s]} ${STATUS_LABEL[s]}</span></div>
+      <div class="elenco-card-meta"><span class="norm-tag">${esc(r.rifNorm||'—')}</span>${r.aspetto?`<span class="tag-chip" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)">${esc(r.aspetto)}</span>`:''} ${r.sede?`<span class="tag-chip" style="background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)">🏭 ${esc(r.sede)}</span>`:''} ${r.freq&&r.freq!=='n.a.'?`<span class="tag-chip" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)">${esc(r.freq)}</span>`:''}</div>
+      ${r.legge?`<div class="elenco-card-law">⚖️ ${esc(r.legge.substring(0,120)+(r.legge.length>120?'…':''))}</div>`:''}
+      <div class="elenco-card-foot"><div style="font-size:10px;color:var(--text-muted)">📅 ${dateStr}${r.resp?' &nbsp;·&nbsp; 👤 '+esc(r.resp):''}</div><div style="display:flex;gap:5px;align-items:center">${filesHtml}<button class="icon-btn" style="width:20px;height:20px;font-size:10px" onclick="event.stopPropagation();deleteRecord(${r.id})" title="Elimina">🗑</button></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ==================== UNITÀ LOCALI ====================
+function renderUL(){
+  const data=getData();
+  const sites=[...new Set(data.map(r=>(r.sede||'Non specificata').trim()))].sort();
+  const tabs=document.getElementById('ulTabs');
+  const content=document.getElementById('ulContent');
+  // build tabs
+  if(!currentULSite&&sites.length)currentULSite='__ALL__';
+  tabs.innerHTML=`<div class="ul-tab${currentULSite==='__ALL__'?' active':''}" onclick="selectULSite('__ALL__',this)">🌐 Tutte le sedi</div>`+
+    sites.map(s=>`<div class="ul-tab${currentULSite===s?' active':''}" onclick="selectULSite('${esc(s)}',this)">🏭 ${esc(s)}</div>`).join('');
+  renderULContent(data,sites);
+}
+function selectULSite(site,el){
+  currentULSite=site;
+  document.querySelectorAll('.ul-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderULContent(getData(),[...new Set(getData().map(r=>(r.sede||'Non specificata').trim()))].sort());
+}
+function renderULContent(data,allSites){
+  const content=document.getElementById('ulContent');
+  const sitesToShow=currentULSite==='__ALL__'?allSites:[currentULSite];
+  content.innerHTML=sitesToShow.map(site=>{
+    const rows=data.filter(r=>(r.sede||'Non specificata').trim()===site);
+    const counts={scaduta:0,urgente:0,in_corso:0,completata:0,no_scadenza:0};
+    rows.forEach(r=>counts[computeStatus(r)]++);
+    // Annual matrix: aspetto -> 12 months
+    const byAspetto={};
+    rows.filter(r=>r.scadenza).forEach(r=>{
+      const asp=r.aspetto||'Altro';
+      if(!byAspetto[asp])byAspetto[asp]=Array(12).fill(null);
+      const m=new Date(r.scadenza).getMonth();
+      if(!byAspetto[asp][m])byAspetto[asp][m]=[];
+      byAspetto[asp][m].push(r);
+    });
+    const matrixHtml=Object.keys(byAspetto).length?`
+      <div class="riepilogo-annual">
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Piano annuale ${currentYear} per aspetto</div>
+        <div class="month-row header"><div class="month-cell" style="text-align:left">Aspetto</div>${MONTHS_SHORT.map(m=>`<div class="month-cell">${m}</div>`).join('')}</div>
+        ${Object.entries(byAspetto).map(([asp,months])=>`
+          <div class="month-row">
+            <div class="aspect-label" title="${esc(asp)}">${esc(asp.substring(0,14))}</div>
+            ${months.map((evs,mi)=>{
+              if(!evs||!evs.length)return`<div class="month-cell"></div>`;
+              const s=computeStatus(evs[0]);
+              const cls=s==='scaduta'?'scaduta-cell':s==='urgente'?'urgente-cell':s==='completata'?'completata-cell':'has-events';
+              const sym=STATUS_SYM[s];
+              return`<div class="month-cell ${cls}" title="${evs.map(r=>r.controllo).join(', ')}" onclick="showULDayDetail(${JSON.stringify(evs.map(r=>r.id))})">${sym} ${evs.length>1?evs.length:''}</div>`;
+            }).join('')}
+          </div>`).join('')}
+      </div>`:
+      `<div style="padding:12px 16px;font-size:11px;color:var(--text-dim)">Nessun adempimento con scadenza definita per questa sede.</div>`;
+    return`<div class="ul-section">
+      <div class="ul-section-header">
+        <div class="ul-section-title">🏭 ${esc(site)} <span style="font-size:11px;color:var(--text-muted);font-weight:400">(${rows.length} adempimenti)</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="openMailModal()">✉ Promemoria</button>
+          <button class="btn btn-sm btn-green" onclick="exportSiteJSON('${esc(site)}')">📥 Esporta</button>
+        </div>
+      </div>
+      <div class="ul-summary-row">
+        <div class="ul-stat"><div class="ul-stat-num" style="color:var(--red)">${counts.scaduta}</div><div class="ul-stat-label">⚠️ Scaduti</div></div>
+        <div class="ul-stat"><div class="ul-stat-num" style="color:var(--orange)">${counts.urgente}</div><div class="ul-stat-label">🔔 Urgenti</div></div>
+        <div class="ul-stat"><div class="ul-stat-num" style="color:var(--blue)">${counts.in_corso}</div><div class="ul-stat-label">🔄 In corso</div></div>
+        <div class="ul-stat"><div class="ul-stat-num" style="color:var(--green)">${counts.completata}</div><div class="ul-stat-label">✅ Completati</div></div>
+        <div class="ul-stat"><div class="ul-stat-num" style="color:var(--gray)">${counts.no_scadenza}</div><div class="ul-stat-label">♾ Senza scad.</div></div>
+      </div>
+      ${matrixHtml}
+      <div style="overflow-x:auto">
+      <table style="width:100%">
+        <thead><tr style="background:var(--surface2);border-bottom:1px solid var(--border)">
+          <th style="padding:7px 10px;font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase">Norma</th>
+          <th style="padding:7px 10px;font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase">Aspetto</th>
+          <th style="padding:7px 10px;font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase">Attività</th>
+          <th style="padding:7px 10px;font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase">Scadenza</th>
+          <th style="padding:7px 10px;font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase">Stato</th>
+          <th style="padding:7px 10px;font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase">Resp.</th>
+          <th style="padding:7px 10px;font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase">Azioni</th>
+        </tr></thead>
+        <tbody>${rows.map(r=>{const s=computeStatus(r);return`<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:8px 10px;font-size:11px"><span class="norm-tag">${esc(r.rifNorm||'—')}</span></td>
+          <td style="padding:8px 10px;font-size:11px">${esc(r.aspetto||'—')}</td>
+          <td style="padding:8px 10px;font-size:11px;max-width:260px">${esc(r.controllo)}</td>
+          <td style="padding:8px 10px">${fmtDate(r.scadenza)}</td>
+          <td style="padding:8px 10px"><span class="status-pill ${s}">${STATUS_LABEL[s]}</span></td>
+          <td style="padding:8px 10px;font-size:11px">${esc(r.resp||'—')}</td>
+          <td style="padding:8px 10px"><div class="action-btns"><button class="icon-btn" onclick="openEditModal(${r.id})">✏️</button></div></td>
+        </tr>`;}).join('')}</tbody>
+      </table></div>
+    </div>`;
+  }).join('');
+}
+function showULDayDetail(ids){
+  const data=getData();
+  const rows=data.filter(r=>ids.includes(r.id));
+  if(!rows.length)return;
+  alert(rows.map(r=>`${STATUS_SYM[computeStatus(r)]} ${r.controllo}\nScadenza: ${r.scadenza||'—'} | Norma: ${r.rifNorm||'—'}`).join('\n\n'));
+}
+
+// ==================== CALENDAR ====================
+function renderCalendar(){
+  document.getElementById('calMonthTitle').textContent=`${MONTHS_IT[calMonth]} ${calYear}`;
+  const data=allData[String(calYear)]||[];
+  const eventMap={};
+  data.forEach(r=>{if(!r.scadenza)return;const k=r.scadenza.substring(0,10);if(!eventMap[k])eventMap[k]=[];eventMap[k].push(r);});
+  const firstDay=new Date(calYear,calMonth,1);
+  let startDow=firstDay.getDay();startDow=startDow===0?6:startDow-1;
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();today.setHours(0,0,0,0);
+  let html='',dayCount=1;
+  const totalCells=Math.ceil((startDow+daysInMonth)/7)*7;
+  for(let i=0;i<totalCells;i++){
+    if(i<startDow){const pd=new Date(calYear,calMonth,i-startDow+1);html+=`<div class="cal-day other-month"><div class="cal-day-num">${pd.getDate()}</div></div>`;}
+    else if(dayCount>daysInMonth){const nm=dayCount-daysInMonth;html+=`<div class="cal-day other-month"><div class="cal-day-num">${nm}</div></div>`;dayCount++;}
+    else{
+      const td=new Date(calYear,calMonth,dayCount);const isToday=td.getTime()===today.getTime();
+      const dk=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(dayCount).padStart(2,'0')}`;
+      const evs=eventMap[dk]||[];const max=3;const shown=evs.slice(0,max);const extra=evs.length-max;
+      const evHtml=shown.map(r=>{const s=computeStatus(r);const sh=r.controllo.length>16?r.controllo.substring(0,16)+'…':r.controllo;return`<div class="cal-event-dot ${s}" onclick="event.stopPropagation();openEditModal(${r.id})" title="${esc(r.controllo)}"><span class="cal-event-sym">${STATUS_SYM[s]}</span><span class="cal-event-label">${esc(sh)}</span></div>`;}).join('');
+      const moreHtml=extra>0?`<div class="cal-more" onclick="event.stopPropagation();showCalPopup('${dk}',${dayCount})">+${extra} altri</div>`:'';
+      const ch=evs.length>0?`onclick="showCalPopup('${dk}',${dayCount})"`:'' ;
+      html+=`<div class="cal-day${isToday?' today':''}" ${ch}><div class="cal-day-num">${dayCount}</div><div class="cal-events">${evHtml}${moreHtml}</div></div>`;
+      dayCount++;
+    }
+  }
+  document.getElementById('calDays').innerHTML=html;
+}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+function calGoToday(){const t=new Date();calYear=t.getFullYear();calMonth=t.getMonth();renderCalendar();}
+function showCalPopup(dk,day){
+  const data=allData[String(calYear)]||[];
+  const evs=data.filter(r=>r.scadenza&&r.scadenza.substring(0,10)===dk);
+  if(!evs.length)return;
+  const popup=document.getElementById('calPopup');
+  document.getElementById('calPopupTitle').textContent=`${day} ${MONTHS_IT[calMonth]} ${calYear} — ${evs.length} adempiment${evs.length>1?'i':'o'}`;
+  document.getElementById('calPopupList').innerHTML=evs.map(r=>{const s=computeStatus(r);return`<div class="cal-popup-item" onclick="closeCalPopup();openEditModal(${r.id})"><div class="cal-popup-item-title">${esc(r.controllo)}</div><div class="cal-popup-item-meta"><span class="status-pill ${s}" style="font-size:10px">${STATUS_SYM[s]} ${STATUS_LABEL[s]}</span><span class="norm-tag">${esc(r.rifNorm||'—')}</span>${r.sede?`<span style="font-size:9px;color:var(--text-muted)">🏭 ${esc(r.sede)}</span>`:''}</div></div>`;}).join('');
+  popup.style.top='50%';popup.style.left='50%';popup.style.transform='translate(-50%,-50%)';
+  popup.classList.add('open');
+}
+function closeCalPopup(){document.getElementById('calPopup').classList.remove('open');}
+
+// ==================== MODAL ADD/EDIT ====================
+function openAddModal(){
+  editingId=null;pendingFiles=[];
+  document.getElementById('modalTitle').textContent='+ Aggiungi adempimento';
+  clearForm();
+  document.getElementById('f_anno').value=currentYear;
+  document.getElementById('f_stato').value='in_corso';
+  document.getElementById('f_resp').value='RSPP';
+  updateFileChips();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function openEditModal(id,focusFile=false){
+  const row=getData().find(r=>r.id===id);if(!row)return;
+  editingId=id;pendingFiles=row.files?JSON.parse(JSON.stringify(row.files)):[];
+  document.getElementById('modalTitle').textContent='Modifica adempimento';
+  document.getElementById('f_rifNorm').value=row.rifNorm||'';
+  document.getElementById('f_anno').value=currentYear;
+  document.getElementById('f_aspetto').value=row.aspetto||'';
+  document.getElementById('f_sede').value=row.sede||'';
+  document.getElementById('f_controllo').value=row.controllo||'';
+  document.getElementById('f_legge').value=row.legge||'';
+  document.getElementById('f_freq').value=row.freq||'';
+  document.getElementById('f_scadenza').value=row.scadenza||'';
+  document.getElementById('f_stato').value=row.stato||'in_corso';
+  document.getElementById('f_resp').value=row.resp||'RSPP';
+  document.getElementById('f_doc').value=row.doc||'';
+  document.getElementById('f_arch').value=row.arch||'';
+  document.getElementById('f_note').value=row.note||'';
+  updateFileChips();
+  document.getElementById('modalOverlay').classList.add('open');
+  if(focusFile)setTimeout(()=>document.getElementById('dropZone').scrollIntoView({behavior:'smooth'}),100);
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');editingId=null;pendingFiles=[];}
+function clearForm(){['f_rifNorm','f_aspetto','f_sede','f_controllo','f_legge','f_freq','f_scadenza','f_doc','f_arch','f_note'].forEach(id=>{document.getElementById(id).value='';});}
+function saveRecord(){
+  const anno=document.getElementById('f_anno').value||currentYear;
+  const record={rifNorm:document.getElementById('f_rifNorm').value.trim(),aspetto:document.getElementById('f_aspetto').value.trim(),sede:document.getElementById('f_sede').value.trim(),controllo:document.getElementById('f_controllo').value.trim(),legge:document.getElementById('f_legge').value.trim(),freq:document.getElementById('f_freq').value.trim(),scadenza:document.getElementById('f_scadenza').value||null,stato:document.getElementById('f_stato').value,resp:document.getElementById('f_resp').value.trim(),doc:document.getElementById('f_doc').value.trim(),arch:document.getElementById('f_arch').value.trim(),note:document.getElementById('f_note').value.trim(),files:pendingFiles};
+  if(!record.controllo){showToast('Inserire una descrizione attività','error');return;}
+  if(!allData[anno])allData[anno]=[];
+  if(editingId!==null){const idx=allData[anno].findIndex(r=>r.id===editingId);if(idx!==-1)allData[anno][idx]={...allData[anno][idx],...record};}
+  else{const maxId=Math.max(0,...Object.values(allData).flat().map(r=>r.id||0));allData[anno].push({id:maxId+1,...record});if(anno!==currentYear){currentYear=anno;document.querySelectorAll('.year-tab').forEach(t=>t.classList.toggle('active',t.textContent===anno));}}
+  saveToStorage();closeModal();refreshAll();showToast('Adempimento salvato ✅');
+}
+function deleteRecord(id){
+  if(!confirm('Eliminare questo adempimento?'))return;
+  const data=getData();const idx=data.findIndex(r=>r.id===id);if(idx!==-1)data.splice(idx,1);
+  saveToStorage();refreshAll();showToast('Eliminato 🗑');
+}
+
+// ==================== IMPORT MODAL ====================
+function openImportModal(){document.getElementById('importLog').style.display='none';document.getElementById('importLog').textContent='';document.getElementById('importPaste').value='';document.getElementById('importModalOverlay').classList.add('open');}
+function closeImportModal(){document.getElementById('importModalOverlay').classList.remove('open');}
+function handleImportFile(files){
+  if(!files||!files.length)return;
+  const f=files[0];const reader=new FileReader();
+  reader.onload=e=>{document.getElementById('importPaste').value=e.target.result;showImportLog('File caricato: '+f.name+' ('+Math.round(f.size/1024)+'KB)');};
+  reader.readAsText(f);
+}
+function processImport(){
+  const raw=document.getElementById('importPaste').value.trim();
+  if(!raw){showToast('Nessun dato da importare','error');return;}
+  let parsed;
+  try{parsed=JSON.parse(raw);}catch(e){showToast('Formato JSON non valido','error');return;}
+  // accept array of records OR full allData object
+  let added=0,updated=0;
+  const process=(items,yr)=>{
+    if(!allData[yr])allData[yr]=[];
+    items.forEach(item=>{
+      const idx=allData[yr].findIndex(r=>r.id===item.id);
+      if(idx!==-1){allData[yr][idx]={...allData[yr][idx],...item};updated++;}
+      else{const maxId=Math.max(0,...Object.values(allData).flat().map(r=>r.id||0));allData[yr].push({id:maxId+1,...item,files:item.files||[]});added++;}
+    });
+  };
+  if(Array.isArray(parsed)){process(parsed,currentYear);}
+  else if(typeof parsed==='object'){Object.entries(parsed).forEach(([yr,items])=>{if(Array.isArray(items))process(items,yr);});}
+  saveToStorage();refreshAll();
+  const msg=`✅ Importazione completata: ${added} aggiunti, ${updated} aggiornati.`;
+  showImportLog(msg);showToast(msg);
+}
+function showImportLog(msg){const log=document.getElementById('importLog');log.style.display='block';log.textContent+=msg+'\n';}
+function exportJSON(){
+  // strip file data to keep size manageable
+  const out={};
+  Object.entries(allData).forEach(([y,items])=>{out[y]=items.map(r=>({...r,files:(r.files||[]).map(f=>({name:f.name,type:f.type}))}) );});
+  download('scadenziario_tutti_anni.json',JSON.stringify(out,null,2));
+  showToast('JSON esportato ✅');
+}
+function exportYearJSON(){
+  const items=(allData[currentYear]||[]).map(r=>({...r,files:(r.files||[]).map(f=>({name:f.name,type:f.type}))}));
+  download(`scadenziario_${currentYear}.json`,JSON.stringify(items,null,2));
+  showToast('JSON anno '+currentYear+' esportato ✅');
+}
+function exportSiteJSON(site){
+  const items=(allData[currentYear]||[]).filter(r=>(r.sede||'').trim()===site).map(r=>({...r,files:(r.files||[]).map(f=>({name:f.name,type:f.type}))}));
+  download(`scadenziario_${currentYear}_${site.replace(/[^a-z0-9]/gi,'_')}.json`,JSON.stringify(items,null,2));
+  showToast('Esportato: '+site);
+}
+function exportULReport(){
+  const data=getData();
+  const sites=[...new Set(data.map(r=>(r.sede||'Non specificata').trim()))].sort();
+  let csv='Anno;Sede;Norma;Aspetto;Controllo;Legge;Frequenza;Scadenza;Stato;Responsabile\n';
+  sites.forEach(site=>{
+    data.filter(r=>(r.sede||'Non specificata').trim()===site).forEach(r=>{
+      csv+=`${currentYear};${r.sede||''};${r.rifNorm||''};${r.aspetto||''};${r.controllo||''};${r.legge||''};${r.freq||''};${r.scadenza||''};${STATUS_LABEL[computeStatus(r)]};${r.resp||''}\n`;
+    });
+  });
+  download(`riepilogo_unita_locali_${currentYear}.csv`,'\uFEFF'+csv);
+  showToast('Riepilogo CSV esportato ✅');
+}
+function download(name,content){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(content);a.download=name;a.click();}
+
+// ==================== MAIL ====================
+function openMailModal(){
+  document.getElementById('mailModalOverlay').classList.add('open');
+  document.getElementById('mailYearLabel').textContent=currentYear;
+  renderMailToList();
+  refreshMailPreview();
+}
+function closeMailModal(){document.getElementById('mailModalOverlay').classList.remove('open');}
+function renderMailToList(){
+  const list=document.getElementById('mailToList');
+  if(!mailRecipients.length){list.innerHTML=`<div style="font-size:11px;color:var(--text-dim);padding:6px 0">Nessun destinatario. Aggiungine uno sotto.</div>`;return;}
+  list.innerHTML=mailRecipients.map((addr,i)=>`<div class="mail-to-item"><input type="checkbox" checked id="mrc_${i}"><label class="mail-to-item-label" for="mrc_${i}">✉ ${esc(addr)}</label><button class="icon-btn" style="width:20px;height:20px;font-size:10px" onclick="removeMailRecipient(${i})">✕</button></div>`).join('');
+}
+function addMailRecipient(){
+  const inp=document.getElementById('newMailAddr');const addr=inp.value.trim();
+  if(!addr||!addr.includes('@')){showToast('Email non valida','error');return;}
+  if(mailRecipients.includes(addr)){showToast('Email già presente','error');return;}
+  mailRecipients.push(addr);inp.value='';renderMailToList();refreshMailPreview();showToast('Destinatario aggiunto ✅');
+}
+function removeMailRecipient(i){mailRecipients.splice(i,1);renderMailToList();refreshMailPreview();}
+function toggleDeadlineChip(el){el.classList.toggle('active');const f=el.dataset.filter;const idx=mailDeadlineFilters.indexOf(f);if(idx===-1)mailDeadlineFilters.push(f);else mailDeadlineFilters.splice(idx,1);refreshMailPreview();}
+function buildMailBody(){
+  const onlyYear=document.getElementById('mailIncludeYear').checked;
+  const years=onlyYear?[currentYear]:Object.keys(allData).sort();
+  let body=`PROMEMORIA ADEMPIMENTI — ISO 14001 / ISO 45001\n`;
+  body+=`${'='.repeat(55)}\n`;
+  body+=`Data: ${new Date().toLocaleDateString('it-IT',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}\n\n`;
+  years.forEach(yr=>{
+    const items=(allData[yr]||[]).filter(r=>mailDeadlineFilters.includes(computeStatus(r)));
+    if(!items.length)return;
+    body+=`ANNO ${yr}\n${'-'.repeat(40)}\n`;
+    const byStatus={scaduta:[],urgente:[],in_corso:[]};
+    items.forEach(r=>{const s=computeStatus(r);if(byStatus[s])byStatus[s].push(r);});
+    if(byStatus.scaduta.length){body+=`\n⚠️  SCADUTI (${byStatus.scaduta.length}):\n`;byStatus.scaduta.forEach(r=>{body+=`  • [${r.rifNorm||'—'}] ${r.controllo}\n    Scaduto il: ${r.scadenza?new Date(r.scadenza).toLocaleDateString('it-IT'):'—'} | Sede: ${r.sede||'—'} | Resp.: ${r.resp||'—'}\n    Legge: ${r.legge||'—'}\n\n`;});}
+    if(byStatus.urgente.length){body+=`\n🔔  URGENTI — scadenza entro 15 giorni (${byStatus.urgente.length}):\n`;byStatus.urgente.forEach(r=>{const diff=Math.floor((new Date(r.scadenza)-new Date())/86400000);body+=`  • [${r.rifNorm||'—'}] ${r.controllo}\n    Scade il: ${new Date(r.scadenza).toLocaleDateString('it-IT')} (fra ${diff} giorni) | Sede: ${r.sede||'—'} | Resp.: ${r.resp||'—'}\n\n`;});}
+    if(byStatus.in_corso.length&&mailDeadlineFilters.includes('in_corso')){body+=`\n🔵  IN CORSO (${byStatus.in_corso.length}):\n`;byStatus.in_corso.forEach(r=>{body+=`  • [${r.rifNorm||'—'}] ${r.controllo} | Scad.: ${r.scadenza?new Date(r.scadenza).toLocaleDateString('it-IT'):'—'}\n`;});body+='\n';}
+  });
+  body+=`${'='.repeat(55)}\n`;
+  body+=`Messaggio generato automaticamente dal Piano Controlli Ambiente & Sicurezza\n`;
+  body+=`ISO 14001:2015 | ISO 45001:2018\n`;
+  return body;
+}
+function refreshMailPreview(){document.getElementById('mailPreview').textContent=buildMailBody();}
+function copyMailBody(){navigator.clipboard.writeText(buildMailBody()).then(()=>showToast('Testo copiato negli appunti ✅')).catch(()=>showToast('Copia non riuscita','error'));}
+function sendMail(){
+  const subject=document.getElementById('mailSubject').value||'Promemoria scadenze';
+  const body=buildMailBody();
+  const checked=mailRecipients.filter((_,i)=>{const cb=document.getElementById('mrc_'+i);return cb&&cb.checked;});
+  if(!checked.length){showToast('Nessun destinatario selezionato','error');return;}
+  const to=checked.join(',');
+  const mailto=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(mailto);
+  showToast('Client email aperto ✅');
+}
+
+// ==================== FILES ====================
+function handleFiles(fileList){
+  Array.from(fileList).forEach(file=>{
+    if(file.size>10*1024*1024){showToast(`File troppo grande: ${file.name}`,'error');return;}
+    const r=new FileReader();r.onload=e=>{pendingFiles.push({name:file.name,data:e.target.result,type:file.type});updateFileChips();};r.readAsDataURL(file);
+  });
+}
+function removeFile(idx){pendingFiles.splice(idx,1);updateFileChips();}
+function updateFileChips(){document.getElementById('fileChips').innerHTML=pendingFiles.map((f,i)=>`<div class="file-chip"><span onclick="openFileIdx(${i})" style="cursor:pointer">📄 ${esc(f.name)}</span><button onclick="removeFile(${i})">✕</button></div>`).join('');}
+function openFileIdx(idx){const f=pendingFiles[idx];if(!f)return;const w=window.open();if(f.type==='application/pdf'){w.document.write(`<iframe src="${f.data}" style="width:100%;height:100%;border:none;"></iframe>`);}else{w.document.write(`<img src="${f.data}" style="max-width:100%">`);}}
+function viewFiles(id){const r=(getData().find(x=>x.id===id)||{});(r.files||[]).forEach(f=>{const w=window.open();if(f.type==='application/pdf'){w.document.write(`<html><body style="margin:0"><iframe src="${f.data}" style="width:100vw;height:100vh;border:none;"></iframe></body></html>`);}else{w.document.write(`<html><body style="margin:0;background:#111;display:flex;justify-content:center"><img src="${f.data}" style="max-width:100vw;max-height:100vh;object-fit:contain"></body></html>`);}});}
+
+// ==================== UTILS ====================
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(d){
+  if(!d)return`<span style="color:var(--text-dim)">—</span>`;
+  const dt=new Date(d),today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.floor((dt-today)/86400000);
+  const fmt=dt.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+  let col='color:var(--text-muted)',extra='';
+  if(diff<0){col='color:var(--red)';extra=` <span style="font-size:9px">(${Math.abs(diff)}gg fa)</span>`;}
+  else if(diff<=15){col='color:var(--orange)';extra=` <span style="font-size:9px">(${diff}gg)</span>`;}
+  return`<div style="font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;${col}">${fmt}${extra}</div>`;
+}
+function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),2800);}
+
+// Close modals on overlay click
+['modalOverlay','importModalOverlay','mailModalOverlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+document.addEventListener('click',e=>{const p=document.getElementById('calPopup');if(p.classList.contains('open')&&!p.contains(e.target))closeCalPopup();});
+
+// Drag & drop for evidence files
+document.addEventListener('DOMContentLoaded',()=>{
+  const zone=document.getElementById('dropZone');
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');handleFiles(e.dataTransfer.files);});
+  // Drag & drop for import
+  const id=document.getElementById('importDrop');
+  id.addEventListener('dragover',e=>{e.preventDefault();id.classList.add('drag-over');});
+  id.addEventListener('dragleave',()=>id.classList.remove('drag-over'));
+  id.addEventListener('drop',e=>{e.preventDefault();id.classList.remove('drag-over');handleImportFile(e.dataTransfer.files);});
+});
+
+// INIT
+initData();
+renderTable();
+</script>
+</body>
+</html>

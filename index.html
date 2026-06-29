@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESG Dashboard — ENCOMAR</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <link rel="manifest" id="pwa-manifest-link"/>
+  <meta name="theme-color" content="#0F6E56"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="ESG ENCOMAR"/>
+
+<style>
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f5f4f0;--bg3:#efefeb;
+  --ink:#1a1a18;--ink2:#6b6b67;--ink3:#9a9a96;
+  --bd:rgba(0,0,0,.11);--bdm:rgba(0,0,0,.20);
+  --r:8px;--rl:12px;
+  --gbg:#EAF3DE;--gt:#2d6e22;
+  --abg:#FAEEDA;--at:#854F0B;
+  --rbg:#FCEBEB;--rt:#A32D2D;
+  --blue:#185FA5;--green:#0F6E56;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--bg3);color:var(--ink);min-height:100vh;font-size:14px;line-height:1.6}
+/* ── HEADER ── */
+header{background:var(--bg);border-bottom:.5px solid var(--bd);padding:0 1.75rem;position:sticky;top:0;z-index:200}
+.hi{max-width:1260px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:58px;gap:.75rem}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-img{width:36px;height:36px;border-radius:6px;object-fit:contain;border:.5px solid var(--bd);background:var(--bg2)}
+.logo-img-placeholder{width:36px;height:36px;border-radius:6px;background:var(--bg2);border:.5px solid var(--bdm);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0}
+.logo h1{font-size:14px;font-weight:600;color:var(--ink)} .logo p{font-size:11px;color:var(--ink2)}
+.tabs{display:flex;height:100%;align-items:stretch;overflow-x:auto}
+.tab{font-size:12px;color:var(--ink2);padding:0 12px;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;height:100%;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:color .15s,border-color .15s;flex-shrink:0}
+.tab:hover{color:var(--ink)} .tab.active{color:var(--ink);border-bottom-color:var(--blue);font-weight:500}
+.lang-sel{font-size:12px;padding:4px 8px;border-radius:var(--r);border:.5px solid var(--bdm);background:var(--bg2);color:var(--ink);cursor:pointer;flex-shrink:0}
+/* ── MAIN ── */
+main{max-width:1260px;margin:0 auto;padding:1.75rem}
+.panel{display:none} .panel.active{display:block}
+/* ── CARD ── */
+.card{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rl);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;cursor:pointer;user-select:none}
+.card-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.card-title{font-size:12px;font-weight:600;color:var(--ink);text-transform:uppercase;letter-spacing:.06em;flex:1}
+.card-toggle{font-size:14px;color:var(--ink3);transition:transform .2s}
+.card-body{overflow:hidden;transition:max-height .3s ease}
+.collapsed .card-body{display:none}
+.collapsed .card-toggle{transform:rotate(-90deg)}
+.stitle{font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem}
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.75rem;margin-bottom:.75rem}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:.75rem;margin-bottom:.75rem}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:.75rem}
+.g6{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-bottom:.75rem}
+/* ── MODULE SELECTOR ── */
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:1rem}
+.mod-tile{border:.5px solid var(--bdm);border-radius:var(--rl);padding:14px 14px 12px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none;display:flex;flex-direction:column;gap:6px;position:relative}
+.mod-tile:hover{border-color:var(--blue);background:rgba(24,95,165,.03)}
+.mod-tile.active{border-color:var(--blue);background:rgba(24,95,165,.06)}
+.mod-tile input[type=checkbox]{position:absolute;top:10px;right:10px;width:15px;height:15px;cursor:pointer}
+.mod-icon{font-size:22px;line-height:1}
+.mod-name{font-size:13px;font-weight:500;color:var(--ink)}
+.mod-desc{font-size:11px;color:var(--ink2);line-height:1.4}
+.mod-section{display:none} .mod-section.active{display:block}
+/* ── FORM ELEMENTS ── */
+.ig{display:flex;flex-direction:column;gap:4px} .ig label{font-size:12px;color:var(--ink2)}
+input[type=text],input[type=number],input[type=email],input[type=tel],textarea,select{padding:7px 10px;border:.5px solid var(--bdm);border-radius:var(--r);background:var(--bg2);color:var(--ink);font-size:13px;width:100%;outline:none;transition:border-color .15s;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,.08)}
+input[type=color]{padding:2px 4px;height:32px;border:.5px solid var(--bdm);border-radius:var(--r);cursor:pointer;background:var(--bg2);width:100%}
+input[type=file]{padding:6px;font-size:12px}
+textarea{resize:vertical;min-height:56px}
+/* ── BUTTONS ── */
+.bp{background:var(--ink);color:var(--bg);border:none;border-radius:var(--r);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s} .bp:hover{opacity:.85}
+.bp-green{background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s} .bp-green:hover{opacity:.85}
+.bs{background:transparent;color:var(--ink);border:.5px solid var(--bdm);border-radius:var(--r);padding:7px 13px;font-size:13px;cursor:pointer} .bs:hover{background:var(--bg2)}
+.brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;align-items:center}
+.bd2{background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:opacity .2s} .bd2:hover{opacity:.9}
+.div{border:none;border-top:.5px solid var(--bd);margin:1rem 0}
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 9px;border-radius:99px}
+.bg{background:var(--gbg);color:var(--gt)} .ba{background:var(--abg);color:var(--at)} .br{background:var(--rbg);color:var(--rt)}
+/* ── METRIC CARD ── */
+.mc{background:var(--bg2);border-radius:var(--r);padding:.9rem 1.1rem}
+.ml{font-size:11px;color:var(--ink2);margin-bottom:3px} .mv{font-size:21px;font-weight:500;line-height:1.1} .mu{font-size:11px;color:var(--ink3);font-weight:400}
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:var(--bg3);padding:7px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);font-weight:600}
+.tbl td{padding:8px 10px;border-bottom:.5px solid var(--bd);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg2)}
+.del-btn{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:16px;padding:1px 5px;border-radius:4px;line-height:1} .del-btn:hover{color:var(--rt);background:var(--rbg)}
+/* ── INFORTUNI ── */
+.inf-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;padding:10px;background:var(--bg2);border-radius:var(--r);margin-bottom:8px;position:relative}
+.inf-del{position:absolute;top:8px;right:8px}
+/* ── PIE ── */
+.pleg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:12px;color:var(--ink2)}
+.pli{display:flex;align-items:center;gap:4px} .pd{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.cw{position:relative;width:100%;height:250px}
+/* ── SPEEDOMETER ── */
+.sw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+.sw{display:flex;flex-direction:column;align-items:center;gap:6px;padding:1.1rem .75rem;background:var(--bg2);border-radius:var(--r)}
+.sn{font-size:12px;font-weight:500;color:var(--ink);text-align:center}
+.sb{display:inline-block;font-size:11px;font-weight:500;padding:3px 12px;border-radius:var(--r)}
+.sg{background:var(--gbg);color:var(--gt)} .sa{background:var(--abg);color:var(--at)} .sr{background:var(--rbg);color:var(--rt)}
+/* ── TARGET TABLE ── */
+.trow{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;align-items:end;padding:9px 12px;border-radius:var(--r);background:var(--bg2);margin-bottom:7px}
+.trow label{font-size:11px;color:var(--ink2);display:block;margin-bottom:3px}
+/* ── IMPORT ── */
+.ia{border:2px dashed var(--bdm);border-radius:var(--rl);padding:2.5rem 2rem;text-align:center;cursor:pointer;display:block;transition:border-color .2s,background .2s;background:var(--bg2);margin-bottom:1rem}
+.ia:hover,.ia.dg{border-color:var(--blue);background:rgba(24,95,165,.04)} .ia input{display:none}
+.ii{font-size:2rem;margin-bottom:.75rem;display:block} .it{font-weight:600;font-size:15px;margin-bottom:3px} .id{font-size:12px;color:var(--ink2)}
+.sm{margin-top:.75rem;padding:10px 14px;border-radius:var(--r);font-size:13px;display:none;line-height:1.4}
+.ss{background:var(--gbg);color:var(--gt);display:block;border:.5px solid var(--gt)} .se{background:var(--rbg);color:var(--rt);display:block;border:.5px solid var(--rt)}
+.tp{width:100%;max-width:460px;border-collapse:collapse;font-size:12px;background:var(--bg)}
+.tp th,.tp td{border:1px solid var(--bdm);padding:5px 9px} .tp th{background:var(--bg3);font-weight:600}
+/* ── PRESETS ── */
+.preset-btn{font-size:11px;padding:4px 10px;border-radius:99px;border:.5px solid var(--bdm);background:var(--bg2);cursor:pointer;color:var(--ink2)} .preset-btn:hover{background:var(--bg3)}
+/* ── LOGO UPLOAD ── */
+.logo-upload-area{border:1.5px dashed var(--bdm);border-radius:var(--r);padding:1.25rem;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg2)}
+.logo-upload-area:hover{border-color:var(--blue)}
+.logo-preview{max-width:160px;max-height:80px;object-fit:contain;display:none;margin:0 auto .5rem}
+/* ── ACCORDION SECTIONS ── */
+.acc-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg2);border-radius:var(--r);cursor:pointer;margin-bottom:6px;user-select:none}
+.acc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.acc-name{font-size:13px;font-weight:500;color:var(--ink);flex:1}
+.acc-arr{font-size:12px;color:var(--ink3);transition:transform .2s}
+.acc-body{padding:0 2px;margin-bottom:6px}
+.acc-closed .acc-arr{transform:rotate(-90deg)}
+.acc-closed .acc-body{display:none}
+@media(max-width:750px){main{padding:1rem}.hi{flex-wrap:wrap;height:auto;padding:8px 0}.tab{padding:0 8px;font-size:11px}.g3,.g2{grid-template-columns:1fr}.inf-row{grid-template-columns:1fr 1fr}}
+
+</style>
+</head>
+<body>
+
+
+<!-- ██████████████ AUTH SYSTEM ██████████████ -->
+<div id="lock-screen" style="
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#0d1117 0%,#1a2035 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+
+  <!-- STEP 1: LOGIN -->
+  <div id="auth-login" style="background:#161b27;border:1px solid #30363d;
+       border-radius:16px;padding:2.5rem 2rem;width:380px;max-width:93vw;
+       text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.6);">
+    <div style="font-size:2.5rem;margin-bottom:.75rem">🔐</div>
+    <h2 style="color:#e6edf3;font-size:18px;font-weight:600;margin-bottom:3px">ESG Dashboard</h2>
+    <p style="color:#8b949e;font-size:11px;margin-bottom:1.5rem;font-family:'Courier New',monospace">
+      ENCOMAR — accesso riservato</p>
+    <div style="text-align:left;margin-bottom:10px;">
+      <label style="font-size:11px;color:#8b949e;display:block;margin-bottom:4px;
+                    font-family:'Courier New',monospace">USERNAME</label>
+      <input id="login-user" type="text" placeholder="nome utente"
+        autocomplete="username"
+        style="width:100%;padding:10px 13px;border:1px solid #30363d;
+               border-radius:8px;background:#0d1117;color:#e6edf3;
+               font-size:14px;outline:none;letter-spacing:.03em;"
+        onkeydown="if(event.key==='Enter') document.getElementById('login-pwd').focus()"/>
+    </div>
+    <div style="text-align:left;margin-bottom:14px;">
+      <label style="font-size:11px;color:#8b949e;display:block;margin-bottom:4px;
+                    font-family:'Courier New',monospace">PASSWORD</label>
+      <input id="login-pwd" type="password" placeholder="password"
+        autocomplete="current-password"
+        style="width:100%;padding:10px 13px;border:1px solid #30363d;
+               border-radius:8px;background:#0d1117;color:#e6edf3;
+               font-size:14px;outline:none;letter-spacing:.06em;"
+        onkeydown="if(event.key==='Enter') authLogin()"/>
+    </div>
+    <button onclick="authLogin()"
+      style="width:100%;padding:11px;border:none;border-radius:8px;
+             background:#238636;color:#fff;font-size:14px;font-weight:600;
+             cursor:pointer;margin-bottom:6px;">
+      Accedi
+    </button>
+    <p id="login-err"
+       style="color:#f85149;font-size:12px;margin-top:8px;display:none;"></p>
+    <p style="color:#484f58;font-size:10px;margin-top:1.25rem;line-height:1.6;">
+      Primo accesso? Usa le credenziali temporanee fornite dall'amministratore.<br>
+      Ti verrà chiesto di personalizzarle subito dopo.
+    </p>
+  </div>
+
+  <!-- STEP 2: CAMBIO CREDENZIALI (primo accesso) -->
+  <div id="auth-change" style="display:none;background:#161b27;
+       border:1px solid #f0883e;border-radius:16px;padding:2.5rem 2rem;
+       width:420px;max-width:93vw;text-align:center;
+       box-shadow:0 24px 64px rgba(0,0,0,.6);">
+    <div style="font-size:2.2rem;margin-bottom:.75rem">🔄</div>
+    <h2 style="color:#e6edf3;font-size:17px;font-weight:600;margin-bottom:4px">
+      Imposta le tue credenziali personali</h2>
+    <p style="color:#8b949e;font-size:12px;margin-bottom:1.5rem;line-height:1.5;">
+      Primo accesso rilevato. Scegli un username e una password personali.<br>
+      <span style="color:#f0883e;">Questo passaggio è obbligatorio.</span>
+    </p>
+
+    <div style="text-align:left;margin-bottom:10px;">
+      <label style="font-size:11px;color:#8b949e;display:block;margin-bottom:4px;
+                    font-family:'Courier New',monospace">
+        NUOVO USERNAME <span style="color:#f0883e">*</span></label>
+      <input id="new-user" type="text" placeholder="es. mario.rossi"
+        style="width:100%;padding:10px 13px;border:1px solid #30363d;
+               border-radius:8px;background:#0d1117;color:#e6edf3;
+               font-size:14px;outline:none;"
+        oninput="checkNewPwdStrength()"/>
+      <p style="font-size:10px;color:#484f58;margin-top:3px;">
+        Minimo 3 caratteri, senza spazi.</p>
+    </div>
+
+    <div style="text-align:left;margin-bottom:10px;">
+      <label style="font-size:11px;color:#8b949e;display:block;margin-bottom:4px;
+                    font-family:'Courier New',monospace">
+        NUOVA PASSWORD <span style="color:#f0883e">*</span></label>
+      <input id="new-pwd" type="password" placeholder="nuova password"
+        style="width:100%;padding:10px 13px;border:1px solid #30363d;
+               border-radius:8px;background:#0d1117;color:#e6edf3;
+               font-size:14px;outline:none;"
+        oninput="checkNewPwdStrength()"/>
+    </div>
+
+    <div style="text-align:left;margin-bottom:8px;">
+      <label style="font-size:11px;color:#8b949e;display:block;margin-bottom:4px;
+                    font-family:'Courier New',monospace">
+        CONFERMA PASSWORD <span style="color:#f0883e">*</span></label>
+      <input id="new-pwd2" type="password" placeholder="ripeti la password"
+        style="width:100%;padding:10px 13px;border:1px solid #30363d;
+               border-radius:8px;background:#0d1117;color:#e6edf3;
+               font-size:14px;outline:none;"
+        oninput="checkNewPwdStrength()"/>
+    </div>
+
+    <!-- Barra forza password -->
+    <div style="height:4px;border-radius:99px;background:#21262d;
+                margin-bottom:5px;overflow:hidden;">
+      <div id="pwd-strength-fill"
+           style="height:100%;width:0%;border-radius:99px;
+                  transition:width .3s,background .3s;"></div>
+    </div>
+    <p id="pwd-strength-label"
+       style="font-size:11px;color:#484f58;text-align:left;margin-bottom:10px;"></p>
+
+    <div style="text-align:left;margin-bottom:14px;
+                font-size:11px;color:#484f58;line-height:1.7;">
+      <span id="rule-len">○ Almeno 8 caratteri</span><br>
+      <span id="rule-upper">○ Almeno una lettera maiuscola</span><br>
+      <span id="rule-num">○ Almeno un numero</span><br>
+      <span id="rule-sym">○ Almeno un simbolo (!@#$%&amp;*...)</span>
+    </div>
+
+    <button id="btn-change" onclick="authChange()" disabled
+      style="width:100%;padding:11px;border:none;border-radius:8px;
+             background:#484f58;color:#8b949e;font-size:14px;font-weight:600;
+             cursor:not-allowed;transition:all .2s;">
+      Salva e accedi
+    </button>
+    <p id="change-err"
+       style="color:#f85149;font-size:12px;margin-top:8px;display:none;"></p>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════ HEADER ══════════════════════════════ -->
+<header>
+  <div class="hi">
+    <div class="logo">
+      <div class="logo-img-placeholder" id="logo-placeholder"
+           onclick="document.getElementById('logo-file').click()"
+           title="Carica logo aziendale">🏢</div>
+      <img id="logo-preview-header" class="logo-img" style="display:none" alt="Logo"/>
+      <input type="file" id="logo-file" accept="image/*"
+             style="display:none" onchange="loadLogo(this)"/>
+      <div>
+        <h1 id="header-company">ESG Dashboard</h1>
+        <p id="app-sub">ENCOMAR — Bilancio di sostenibilità</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" id="tab-company" onclick="sw('company')" role="tab">🏢 <span id="tn-company">Azienda</span></button>
+      <button class="tab"        id="tab-data"    onclick="sw('data')"    role="tab">📋 <span id="tn-data">Dati</span></button>
+      <button class="tab"        id="tab-target"  onclick="sw('target')"  role="tab">🎯 <span id="tn-target">Target</span></button>
+      <button class="tab"        id="tab-kpi"     onclick="sw('kpi')"     role="tab">📊 <span id="tn-kpi">KPI</span></button>
+      <button class="tab"        id="tab-import"  onclick="sw('import')"  role="tab">📂 <span id="tn-import">Importa</span></button>
+      <button class="tab"        id="tab-scad"    onclick="sw('scad')"    role="tab">📅 <span id="tn-scad">Scadenziario</span></button>
+    </nav>
+    <select class="lang-sel" onchange="changeLang(this.value)" aria-label="Lingua">
+      <option value="it">🇮🇹 IT</option>
+      <option value="en">🇬🇧 EN</option>
+      <option value="fr">🇫🇷 FR</option>
+      <option value="de">🇩🇪 DE</option>
+    </select>
+  </div>
+</header>
+
+<main>
+
+
+<main>
+<!-- ══════════════════════════════════════════════════════════════════
+     PANEL: AZIENDA
+══════════════════════════════════════════════════════════════════ -->
+<div class="panel active" id="panel-company">
+
+  <!-- LOGO + INTESTAZIONE -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon" style="background:#E6F1FB">🏢</div>
+      <span class="card-title" id="lbl-sec-ana">Anagrafica azienda</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="g2" style="margin-bottom:1rem">
+        <!-- LOGO UPLOAD -->
+        <div>
+          <p class="stitle" id="lbl-logo">Logo aziendale</p>
+          <label class="logo-upload-area" for="logo-file-main">
+            <img id="logo-preview-main" class="logo-preview" alt="Logo"/>
+            <div id="logo-placeholder-main">
+              <div style="font-size:2rem;margin-bottom:6px">📷</div>
+              <p style="font-size:13px;font-weight:500" id="lbl-logo-drag">Clicca per caricare il logo</p>
+              <p style="font-size:11px;color:var(--ink2)" id="lbl-logo-fmt">PNG, JPG, SVG — max 2MB</p>
+            </div>
+            <input type="file" id="logo-file-main" accept="image/*" style="display:none" onchange="loadLogo(this)"/>
+          </label>
+        </div>
+        <div>
+          <p class="stitle" id="lbl-ragione">Dati identificativi</p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="ig"><label id="lbl-rs">Ragione sociale *</label><input type="text" id="a-ragione" placeholder="Es. ENCOMAR S.r.l." oninput="syncCompanyName()"/></div>
+            <div class="ig"><label id="lbl-piva">Partita IVA *</label><input type="text" id="a-piva" placeholder="IT01234567890"/></div>
+            <div class="ig"><label id="lbl-cf">Codice Fiscale</label><input type="text" id="a-cf" placeholder=""/></div>
+            <div class="ig"><label id="lbl-ateco">Codice ATECO *</label><input type="text" id="a-ateco" placeholder="Es. 38.32.10"/></div>
+            <div class="ig"><label id="lbl-ateco-desc">Descrizione attività ATECO</label><input type="text" id="a-ateco-desc" placeholder="Es. Recupero rifiuti non metallici"/></div>
+          </div>
+        </div>
+      </div>
+      <hr class="div">
+      <!-- SEDE LEGALE -->
+      <p class="stitle" id="lbl-sede-leg">Sede legale</p>
+      <div class="g3" style="margin-bottom:.5rem">
+        <div class="ig"><label id="lbl-sl-via">Via / Piazza</label><input type="text" id="sl-via" placeholder="Via Roma 1"/></div>
+        <div class="ig"><label id="lbl-sl-cap">CAP</label><input type="text" id="sl-cap" placeholder="41100" maxlength="5"/></div>
+        <div class="ig"><label id="lbl-sl-citta">Città</label><input type="text" id="sl-citta" placeholder="Modena"/></div>
+        <div class="ig"><label id="lbl-sl-prov">Provincia</label><input type="text" id="sl-prov" placeholder="MO" maxlength="2" style="text-transform:uppercase"/></div>
+        <div class="ig"><label id="lbl-sl-reg">Regione</label><input type="text" id="sl-reg" placeholder="Emilia-Romagna"/></div>
+        <div class="ig"><label id="lbl-sl-paese">Paese</label><input type="text" id="sl-paese" value="Italia"/></div>
+      </div>
+      <!-- SEDI OPERATIVE -->
+      <hr class="div">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+        <p class="stitle" style="margin:0" id="lbl-sedi-op">Sedi operative</p>
+        <button class="bs" style="font-size:12px;padding:5px 12px" onclick="addSedeOp()">+ Aggiungi sede</button>
+      </div>
+      <div id="sedi-op-list"></div>
+      <!-- CONTATTI -->
+      <hr class="div">
+      <p class="stitle" id="lbl-contatti">Contatti</p>
+      <div class="g3">
+        <div class="ig"><label id="lbl-tel">Telefono</label><input type="tel" id="a-tel" placeholder="+39 059 000000"/></div>
+        <div class="ig"><label id="lbl-email">Email</label><input type="email" id="a-email" placeholder="info@azienda.it"/></div>
+        <div class="ig"><label id="lbl-pec">PEC</label><input type="email" id="a-pec" placeholder="azienda@pec.it"/></div>
+        <div class="ig"><label id="lbl-web">Sito web</label><input type="text" id="a-web" placeholder="www.azienda.it"/></div>
+        <div class="ig"><label id="lbl-anno-cost">Anno di costituzione</label><input type="number" id="a-anno-cost" placeholder="1990" min="1800" max="2100"/></div>
+        <div class="ig"><label id="lbl-anno-rif">Anno di riferimento *</label><input type="number" id="year" value="2024"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONALE -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon" style="background:#FAEEDA">👥</div>
+      <span class="card-title" id="lbl-sec-pers">Personale e risorse umane</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <!-- TOTALI -->
+      <p class="stitle" id="lbl-pers-totali">Organico totale</p>
+      <div class="g4">
+        <div class="ig"><label id="lbl-dip-tot">Totale dipendenti *</label><input type="number" id="employees" value="25" min="0" onchange="calcKPI()"/></div>
+        <div class="ig"><label id="lbl-dip-ti">Tempo indeterminato</label><input type="number" id="dip-ti" value="20" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-td">Tempo determinato</label><input type="number" id="dip-td" value="3" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-pt">Part-time</label><input type="number" id="dip-pt" value="2" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-somm">Somministrati/Interinali</label><input type="number" id="dip-somm" value="0" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-coll">Collaboratori/Autonomi</label><input type="number" id="dip-coll" value="0" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-appren">Apprendisti</label><input type="number" id="dip-appren" value="0" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-stage">Stagisti/Tirocinanti</label><input type="number" id="dip-stage" value="0" min="0"/></div>
+      </div>
+      <hr class="div">
+      <!-- GENERE -->
+      <p class="stitle" id="lbl-genere">Distribuzione per genere</p>
+      <div class="g4">
+        <div class="ig"><label id="lbl-dip-m">Uomini</label><input type="number" id="dip-m" value="16" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-f">Donne</label><input type="number" id="dip-f" value="9" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-f-lead">Donne in ruoli dirigenziali</label><input type="number" id="dip-f-lead" value="2" min="0"/></div>
+        <div class="ig"><label id="lbl-dip-dis">Persone con disabilità (L.68/99)</label><input type="number" id="dip-dis" value="0" min="0"/></div>
+      </div>
+      <hr class="div">
+      <!-- ETA -->
+      <p class="stitle" id="lbl-eta">Fasce d'età</p>
+      <div class="g4">
+        <div class="ig"><label>&lt; 30 anni</label><input type="number" id="eta-u30" value="3" min="0"/></div>
+        <div class="ig"><label>30–40 anni</label><input type="number" id="eta-3040" value="8" min="0"/></div>
+        <div class="ig"><label>41–50 anni</label><input type="number" id="eta-4150" value="9" min="0"/></div>
+        <div class="ig"><label>&gt; 50 anni</label><input type="number" id="eta-o50" value="5" min="0"/></div>
+      </div>
+      <hr class="div">
+      <!-- TITOLO DI STUDIO -->
+      <p class="stitle" id="lbl-titolo">Titolo di studio</p>
+      <div class="g4">
+        <div class="ig"><label id="lbl-ts-elem">Licenza elementare</label><input type="number" id="ts-elem" value="0" min="0"/></div>
+        <div class="ig"><label id="lbl-ts-media">Licenza media</label><input type="number" id="ts-media" value="4" min="0"/></div>
+        <div class="ig"><label id="lbl-ts-prof">Qualifica professionale</label><input type="number" id="ts-prof" value="3" min="0"/></div>
+        <div class="ig"><label id="lbl-ts-diplo">Diploma</label><input type="number" id="ts-diplo" value="12" min="0"/></div>
+        <div class="ig"><label id="lbl-ts-its">ITS / Tecnico Superiore</label><input type="number" id="ts-its" value="1" min="0"/></div>
+        <div class="ig"><label id="lbl-ts-laur">Laurea triennale</label><input type="number" id="ts-laur" value="3" min="0"/></div>
+        <div class="ig"><label id="lbl-ts-laur2">Laurea magistrale</label><input type="number" id="ts-laur2" value="2" min="0"/></div>
+        <div class="ig"><label id="lbl-ts-master">Master / Dottorato</label><input type="number" id="ts-master" value="0" min="0"/></div>
+      </div>
+      <hr class="div">
+      <!-- CCNL -->
+      <p class="stitle" id="lbl-ccnl-sec">CCNL e retribuzione</p>
+      <div class="g3">
+        <div class="ig"><label id="lbl-ccnl">CCNL applicato</label><input type="text" id="a-ccnl" placeholder="Es. CCNL Metalmeccanici Industria"/></div>
+        <div class="ig"><label id="lbl-ret-media">Retribuzione media annua lorda (€)</label><input type="number" id="a-ret" placeholder="28000" min="0"/></div>
+        <div class="ig"><label id="lbl-ret-m">Retribuzione media uomini (€)</label><input type="number" id="a-ret-m" placeholder="29000" min="0"/></div>
+        <div class="ig"><label id="lbl-ret-f">Retribuzione media donne (€)</label><input type="number" id="a-ret-f" placeholder="26500" min="0"/></div>
+        <div class="ig"><label id="lbl-turn">Tasso turnover (%)</label><input type="number" id="a-turn" placeholder="8" step="0.1" min="0"/></div>
+        <div class="ig"><label id="lbl-assent">Tasso assenteismo (%)</label><input type="number" id="a-assent" placeholder="3.5" step="0.1" min="0"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELEZIONE MODULI -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon" style="background:#EAF3DE">📑</div>
+      <span class="card-title" id="lbl-sec-moduli">Seleziona gli indici da compilare</span>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--ink2);margin-bottom:1rem" id="lbl-moduli-desc">Seleziona le sezioni di interesse. Le schede di inserimento compariranno nella tab "Dati".</p>
+      <div class="mod-grid" id="module-grid"></div>
+    </div>
+  </div>
+
+  <div class="brow">
+    <button class="bp-green" onclick="saveCompany();sw('data')">Salva e vai ai Dati →</button>
+    <button class="bs" onclick="window.print()">🖨 Stampa scheda</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PANEL: DATI
+══════════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-data">
+  <div id="data-modules-container">
+    <!-- moduli iniettati dinamicamente da JS -->
+  </div>
+  <div class="brow">
+    <button class="bp" onclick="calcKPI();sw('kpi')" id="btn-calc">Calcola KPI →</button>
+    <button class="bs" onclick="sw('company')">← Anagrafica</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PANEL: TARGET
+══════════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-target">
+  <div class="card">
+    <p class="stitle" id="lbl-tgt-title">Target personalizzati &amp; Baseline</p>
+    <p style="font-size:13px;color:var(--ink2);margin-bottom:1.25rem" id="lbl-tgt-desc">Definisci obiettivi e baseline. Le linee appariranno sui grafici.</p>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;padding:7px 12px;background:var(--bg3);border-radius:var(--r);margin-bottom:6px">
+      <span style="font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em" id="th-ind">Indicatore</span>
+      <span style="font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em" id="th-val">Valore obiettivo</span>
+      <span style="font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em" id="th-um">Unità di misura</span>
+      <span style="font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em" id="th-bl">Baseline anno prec.</span>
+    </div>
+    <div id="target-rows"></div>
+    <div class="brow"><button class="bp" onclick="calcKPI();sw('kpi')" id="btn-apply">Applica →</button></div>
+  </div>
+  <!-- IMPOSTAZIONI GRAFICI -->
+  <div class="card">
+    <p class="stitle" id="lbl-chart-cfg">Configurazione grafici</p>
+    <div class="g3">
+      <div class="ig"><label id="lbl-chart-type-trend">Tipo — Grafico mensile</label>
+        <select id="chart-type-trend" onchange="calcKPI()">
+          <option value="bar">Barre</option><option value="line">Linee</option><option value="bar+line">Barre + Linea andamento</option>
+        </select></div>
+      <div class="ig"><label id="lbl-chart-type-dist">Tipo — Distribuzione</label>
+        <select id="chart-type-dist" onchange="calcKPI()">
+          <option value="pie">Torta</option><option value="doughnut">Ciambella</option><option value="polarArea">Polare</option><option value="bar">Barre orizzontali</option>
+        </select></div>
+      <div class="ig"><label id="lbl-show-refs">Linee di riferimento</label>
+        <select id="show-refs" onchange="calcKPI()">
+          <option value="both">Target + Baseline</option><option value="target">Solo Target</option><option value="baseline">Solo Baseline</option><option value="none">Nessuna</option>
+        </select></div>
+    </div>
+    <hr class="div">
+    <p class="stitle" id="lbl-palette">Palette colori</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:.75rem">
+      <div class="ig" style="min-width:64px"><label id="lbl-c1">Principale</label><input type="color" id="c1" value="#185FA5" onchange="calcKPI()"/></div>
+      <div class="ig" style="min-width:64px"><label id="lbl-c2">Secondario</label><input type="color" id="c2" value="#0F6E56" onchange="calcKPI()"/></div>
+      <div class="ig" style="min-width:64px"><label id="lbl-c3">Terzo</label><input type="color" id="c3" value="#BA7517" onchange="calcKPI()"/></div>
+      <div class="ig" style="min-width:64px"><label id="lbl-c4">Quarto</label><input type="color" id="c4" value="#993C1D" onchange="calcKPI()"/></div>
+      <div class="ig" style="min-width:64px"><label id="lbl-ctg">Target</label><input type="color" id="ct" value="#E24B4A" onchange="calcKPI()"/></div>
+      <div class="ig" style="min-width:64px"><label id="lbl-cbl">Baseline</label><input type="color" id="cb" value="#9a9a96" onchange="calcKPI()"/></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="preset-btn" onclick="applyPreset('green')">🌿 Verde</button>
+        <button class="preset-btn" onclick="applyPreset('blue')">🔵 Blu</button>
+        <button class="preset-btn" onclick="applyPreset('warm')">🔴 Caldo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PANEL: KPI
+══════════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-kpi">
+  <div class="g4" id="metric-cards"></div>
+  <div class="card"><p class="stitle" id="lbl-conv">Conversioni energetiche</p><div class="g4" id="conversion-cards"></div></div>
+  <div class="g2">
+    <div class="card">
+      <p class="stitle" id="lbl-andamento">Consumi mensili (kWh)</p>
+      <div class="cw"><canvas id="barChart" role="img" aria-label="Consumi mensili"></canvas></div>
+    </div>
+    <div class="card">
+      <p class="stitle" id="lbl-dist">Distribuzione trimestrale</p>
+      <div class="pleg" id="pie-legend"></div>
+      <div class="cw"><canvas id="pieChart" role="img" aria-label="Distribuzione trimestrale"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <p class="stitle" id="lbl-perf">Indicatori di performance — Semaforo</p>
+    <div class="sw-grid" id="speedometers"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PANEL: IMPORT
+══════════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-import">
+  <div class="card">
+    <p class="stitle" id="lbl-imp-sec">Importazione Excel</p>
+    <label class="ia" id="drop-zone" for="file-input">
+      <span class="ii">📈</span>
+      <p class="it" id="lbl-imp-drag">Trascina il file compilato o clicca per selezionarlo</p>
+      <p class="id" id="lbl-imp-fmt">Formati accettati: .xlsx, .xls</p>
+      <input type="file" id="file-input" accept=".xlsx,.xls" onchange="handleFile(this.files[0])">
+    </label>
+    <div id="import-status"></div>
+    <div style="margin-top:2rem;text-align:center;border-top:.5px solid var(--bd);padding-top:1.5rem">
+      <p class="stitle" id="lbl-nofile">Non hai ancora il file?</p>
+      <p style="font-size:13px;color:var(--ink2);margin-bottom:12px" id="lbl-dldesc">Scarica il modello, inserisci i dati e caricalo qui.</p>
+      <button class="bd2" onclick="generateAndDownloadTemplate()">📥 Scarica Modello Universale (.xlsx)</button>
+      <p class="stitle" style="margin-bottom:5px">Struttura del Modello</p>
+      <table class="tp" style="margin:0 auto">
+        <thead><tr><th>Foglio</th><th>Contenuto</th></tr></thead>
+        <tbody>
+          <tr><td>ISTRUZIONI</td><td>Guida alla compilazione</td></tr>
+          <tr><td>ANAGRAFICA</td><td>Dati azienda, referente, perimetro</td></tr>
+          <tr><td>ENERGIA</td><td>kWh, TEP, rinnovabili, CO₂, soglie</td></tr>
+          <tr><td>AMBIENTE</td><td>Rifiuti, acqua, emissioni, mobilità</td></tr>
+          <tr><td>SICUREZZA</td><td>Infortuni, formazione, DPI</td></tr>
+          <tr><td>RISORSE_UMANE</td><td>Organico, genere, welfare, turnover</td></tr>
+          <tr><td>GOVERNANCE</td><td>Certificazioni, audit, compliance</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:var(--ink2);margin-top:8px">⚠ Compila solo celle grigio chiaro. Campi * = obbligatori.</p>
+    </div>
+  </div>
+</div>
+</main>
+
+
+<!-- ══════════════════════════ PANEL: SCADENZIARIO ══════════════════════════ -->
+<div class="panel" id="panel-scad">
+  <div style="background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rl);overflow:hidden;margin-bottom:1rem;">
+    <div style="padding:.75rem 1.25rem;background:#0d1117;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:15px">📅</span>
+      <span style="font-size:13px;font-weight:500;color:#e6edf3;">Scadenziario Adempimenti ISO 14001 / 45001</span>
+      <span style="margin-left:auto;font-size:11px;color:#484f58;">modulo integrato — dati separati dalla dashboard</span>
+    </div>
+    <iframe
+      id="scad-iframe"
+      src="scadenziario_ESG.html"
+      style="width:100%;height:calc(100vh - 120px);min-height:700px;border:none;display:block;"
+      title="Scadenziario ESG ENCOMAR"
+      loading="lazy">
+    </iframe>
+  </div>
+  <p style="font-size:11px;color:var(--ink2);text-align:center;padding-bottom:.5rem;">
+    ⓘ Lo scadenziario è un modulo autonomo. Per aprirlo a schermo intero:
+    <button onclick="document.getElementById('scad-iframe').requestFullscreen()"
+      style="font-size:11px;padding:3px 10px;border-radius:99px;border:.5px solid var(--bdm);background:var(--bg2);cursor:pointer;margin-left:4px;">
+      ⛶ Schermo intero
+    </button>
+    <button onclick="window.open('scadenziario_ESG.html','_blank')"
+      style="font-size:11px;padding:3px 10px;border-radius:99px;border:.5px solid var(--bdm);background:var(--bg2);cursor:pointer;margin-left:4px;">
+      ↗ Apri in nuova finestra
+    </button>
+  </p>
+</div>
+
+</main>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// LOGICA PRINCIPALE v5
+// ════════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════
+// i18n
+// ═══════════════════════════════════════════════════════════════════
+var LANG={
+  it:{sub:'Bilancio di sostenibilità',
+      tabCompany:'Azienda',tabData:'Dati',tabTarget:'Target',tabKpi:'KPI & Grafici',tabImport:'Importa',
+      kpiTot:'Totale annuo',kpiDip:'kWh per dipendente',kpiTarget:'vs Target',kpiPrec:'vs Anno prec.',
+      ottimo:'Ottimo ✓',norma:'Nella norma',critico:'Critico ⚠',
+      effic:'Efficienza energetica',riduz:'Riduzione consumi',intens:'Intensità per dipendente',
+      months:['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'],
+      q:['Q1','Q2','Q3','Q4'],
+      conv:'Conversioni energetiche',andamento:'Consumi mensili (kWh)',dist:'Distribuzione trimestrale',perf:'Indicatori — Semaforo',
+      tklbl:'Target annuo (kWh)',btnApply:'Applica →',btnCalc:'Calcola KPI →'},
+  en:{sub:'Sustainability Report',
+      tabCompany:'Company',tabData:'Data',tabTarget:'Targets',tabKpi:'KPI & Charts',tabImport:'Import',
+      kpiTot:'Annual total',kpiDip:'kWh per employee',kpiTarget:'vs Target',kpiPrec:'vs Prev yr',
+      ottimo:'Excellent ✓',norma:'On track',critico:'Critical ⚠',
+      effic:'Energy efficiency',riduz:'Consumption reduction',intens:'Energy intensity',
+      months:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      q:['Q1','Q2','Q3','Q4'],
+      conv:'Energy conversions',andamento:'Monthly consumption (kWh)',dist:'Quarterly breakdown',perf:'Indicators — Traffic light',
+      tklbl:'Annual target (kWh)',btnApply:'Apply →',btnCalc:'Calculate KPI →'},
+  fr:{sub:'Rapport de durabilité',
+      tabCompany:'Société',tabData:'Données',tabTarget:'Objectifs',tabKpi:'KPI & Graphiques',tabImport:'Importer',
+      kpiTot:'Total annuel',kpiDip:'kWh par employé',kpiTarget:'vs Objectif',kpiPrec:'vs Année préc.',
+      ottimo:'Excellent ✓',norma:'Dans la norme',critico:'Critique ⚠',
+      effic:'Efficacité énergétique',riduz:'Réduction conso.',intens:'Intensité par employé',
+      months:['Jan','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep','Oct','Nov','Déc'],
+      q:['Q1','Q2','Q3','Q4'],
+      conv:'Conversions énergétiques',andamento:'Tendance mensuelle (kWh)',dist:'Répartition trimestrielle',perf:'Indicateurs — Feux',
+      tklbl:'Objectif annuel (kWh)',btnApply:'Appliquer →',btnCalc:'Calculer KPI →'},
+  de:{sub:'Nachhaltigkeitsbericht',
+      tabCompany:'Unternehmen',tabData:'Daten',tabTarget:'Ziele',tabKpi:'KPI & Diagramme',tabImport:'Importieren',
+      kpiTot:'Jahresgesamt',kpiDip:'kWh je Mitarbeiter',kpiTarget:'vs Ziel',kpiPrec:'vs Vorjahr',
+      ottimo:'Ausgezeichnet ✓',norma:'Im Normalbereich',critico:'Kritisch ⚠',
+      effic:'Energieeffizienz',riduz:'Verbrauchssenkung',intens:'Intensität je MA',
+      months:['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
+      q:['Q1','Q2','Q3','Q4'],
+      conv:'Energieumrechnungen',andamento:'Monatlicher Verbrauch (kWh)',dist:'Quartalsverteilung',perf:'Indikatoren — Ampel',
+      tklbl:'Jahresziel (kWh)',btnApply:'Anwenden →',btnCalc:'KPI berechnen →'}
+};
+var CL='it';
+function T(k){return(LANG[CL]&&LANG[CL][k])?LANG[CL][k]:(LANG.it[k]||k);}
+
+// ═══════════════════════════════════════════════════════════════════
+// MODULES DEFINITION
+// ═══════════════════════════════════════════════════════════════════
+var MODULES=[
+  {id:'energia',  icon:'⚡',name:'Dati Energetici',   color:'#E6F1FB', desc:'Metano, gasolio, energia elettrica, fotovoltaico',   active:true},
+  {id:'idrico',   icon:'💧',name:'Dati Idrici',        color:'#E6F4FF', desc:'Consumi acqua, reflui, riuso, depurazione',           active:false},
+  {id:'rifiuti',  icon:'♻️',name:'Rifiuti',             color:'#EAF3DE', desc:'Rifiuti prodotti, recupero, smaltimento, EoW',        active:false},
+  {id:'sicurezza',icon:'🦺',name:'Sicurezza',           color:'#FCEBEB', desc:'Infortuni, DPI, adempimenti, visite mediche',         active:true},
+  {id:'formazione',icon:'🎓',name:'Formazione',         color:'#FAEEDA', desc:'Ore formazione, competenze, certificati personale',   active:false},
+  {id:'audit',    icon:'🔍',name:'Audit',               color:'#F5F0FF', desc:'Audit interni ed esterni, NC, azioni correttive',     active:false},
+  {id:'amm',      icon:'📑',name:'Dati Amministrativi', color:'#F5F4F0', desc:'Fatturato, costi ambientali, investimenti ESG',       active:false},
+  {id:'emissioni',icon:'🌫️',name:'Emissioni',           color:'#F0F4E8', desc:'Scope 1, Scope 2, CO₂ evitata, mobilità',            active:false},
+];
+
+function buildModuleGrid(){
+  var g=document.getElementById('module-grid');
+  if(!g)return;
+  g.innerHTML='';
+  MODULES.forEach(function(m){
+    var d=document.createElement('div');
+    d.className='mod-tile'+(m.active?' active':'');
+    d.style.background=m.active?m.color.replace(')',',.15)'):'var(--bg)';
+    d.innerHTML='<input type="checkbox" id="mod-cb-'+m.id+'"'+(m.active?' checked':'')+' onchange="toggleModule(\''+m.id+'\',this.checked)">'
+      +'<div class="mod-icon">'+m.icon+'</div>'
+      +'<div class="mod-name">'+m.name+'</div>'
+      +'<div class="mod-desc">'+m.desc+'</div>';
+    d.onclick=function(e){if(e.target.type!=='checkbox'){var cb=document.getElementById('mod-cb-'+m.id);cb.checked=!cb.checked;toggleModule(m.id,cb.checked);}};
+    g.appendChild(d);
+  });
+}
+
+function toggleModule(id,active){
+  MODULES.forEach(function(m){if(m.id===id){m.active=active;}});
+  buildModuleGrid();
+  buildDataPanel();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BUILD DATA PANEL (moduli attivi)
+// ═══════════════════════════════════════════════════════════════════
+function buildDataPanel(){
+  var c=document.getElementById('data-modules-container');
+  if(!c)return;
+  c.innerHTML='';
+  MODULES.filter(function(m){return m.active;}).forEach(function(m){
+    var sec=document.createElement('div');
+    sec.className='card';
+    sec.id='mod-sec-'+m.id;
+    sec.innerHTML='<div class="card-header" onclick="toggleCard(this)">'
+      +'<div class="card-icon" style="background:'+m.color+'">'+m.icon+'</div>'
+      +'<span class="card-title">'+m.name+'</span>'
+      +'<span class="card-toggle">▼</span>'
+      +'</div>'
+      +'<div class="card-body" id="mod-body-'+m.id+'"></div>';
+    c.appendChild(sec);
+    fillModuleBody(m.id, document.getElementById('mod-body-'+m.id));
+  });
+}
+// ─── ENERGIA ──────────────────────────────────────────────────────
+function buildEnergiaHTML(){
+  var ms=T('months');
+  var mi='';
+  for(var i=0;i<12;i++) mi+='<div class="ig"><label>'+ms[i]+'</label><input type="number" id="m'+i+'" value="'+ [7200,6800,7500,8100,9200,9800,10200,9500,8800,7900,7100,6900][i]+'" onchange="calcKPI()"/></div>';
+  return '<p class="stitle">Energia elettrica da rete (kWh/mese)</p>'
+    +'<div class="g6">'+mi+'</div>'
+    +'<hr class="div">'
+    +'<p class="stitle">Gas naturale (Sm³/mese)</p>'
+    +'<div class="g6">'+buildMonthRow('gas','Sm³',[420,390,380,310,290,260,250,260,280,330,390,430])+'</div>'
+    +'<hr class="div">'
+    +'<p class="stitle">Gasolio automezzi e macchinari (L/mese)</p>'
+    +'<div class="g6">'+buildMonthRow('gasolio','L',[180,170,175,195,210,230,240,225,200,185,175,160])+'</div>'
+    +'<hr class="div">'
+    +'<p class="stitle">Fotovoltaico</p>'
+    +'<div class="g4">'
+    +'<div class="ig"><label>kWh prodotti da FV (anno)</label><input type="number" id="fv-prod" value="12000" onchange="calcKPI()"/></div>'
+    +'<div class="ig"><label>kWh autoconsumati da FV</label><input type="number" id="fv-auto" value="8000" onchange="calcKPI()"/></div>'
+    +'<div class="ig"><label>kWh ceduti in rete (GSE)</label><input type="number" id="fv-ceduti" value="4000" onchange="calcKPI()"/></div>'
+    +'<div class="ig"><label>Potenza impianto (kWp)</label><input type="number" id="fv-kw" value="15" step="0.1"/></div>'
+    +'</div>'
+    +'<hr class="div">'
+    +'<div class="g3">'
+    +'<div class="ig"><label id="lbl-tklbl">Target annuo (kWh)</label><input type="number" id="target-kwh" value="80000" onchange="calcKPI()"/></div>'
+    +'<div class="ig"><label>Anno precedente (kWh)</label><input type="number" id="prev-year" value="98000" onchange="calcKPI()"/></div>'
+    +'</div>';
+}
+
+function buildMonthRow(prefix,unit,defaults){
+  var ms=T('months'); var html='';
+  for(var i=0;i<12;i++) html+='<div class="ig"><label>'+ms[i]+'</label><input type="number" id="'+prefix+'-m'+i+'" value="'+defaults[i]+'"/></div>';
+  return html;
+}
+
+// ─── IDRICO ───────────────────────────────────────────────────────
+
+
+
+// ─── RIFIUTI ──────────────────────────────────────────────────────
+
+
+
+// ─── EMISSIONI ────────────────────────────────────────────────────
+function buildEmissioniHTML(){
+  return '<div class="g4">'
+    +'<div class="ig"><label>CO₂eq Scope 1 — gas (ton)</label><input type="number" id="co2-gas" placeholder="0" step="0.01"/></div>'
+    +'<div class="ig"><label>CO₂eq Scope 1 — gasolio (ton)</label><input type="number" id="co2-gas2" placeholder="0" step="0.01"/></div>'
+    +'<div class="ig"><label>CO₂eq Scope 2 — energia EE (ton)</label><input type="number" id="co2-ee" placeholder="0" step="0.01"/></div>'
+    +'<div class="ig"><label>CO₂ evitata da FV (ton)</label><input type="number" id="co2-fv" placeholder="0" step="0.01"/></div>'
+    +'<div class="ig"><label>NOx emessi (kg)</label><input type="number" id="em-nox" placeholder="0" step="0.1"/></div>'
+    +'<div class="ig"><label>SOx emessi (kg)</label><input type="number" id="em-sox" placeholder="0" step="0.1"/></div>'
+    +'<div class="ig"><label>Polveri PM emesse (kg)</label><input type="number" id="em-pm" placeholder="0" step="0.1"/></div>'
+    +'<div class="ig"><label>N° autorizzazioni AIA/emissioni</label><input type="number" id="em-aut" placeholder="0"/></div>'
+    +'</div>';
+}
+
+// ─── SICUREZZA ────────────────────────────────────────────────────
+var infortuni_list=[];
+function buildSicurezzaHTML(){
+  return '<p class="stitle">Dati aggregati</p>'
+    +'<div class="g4">'
+    +'<div class="ig"><label>Ore totali lavorate</label><input type="number" id="sic-ore" placeholder="52000" onchange="calcKPI()"/></div>'
+    +'<div class="ig"><label>N° visite mediche eseguite</label><input type="number" id="sic-visite" placeholder="0"/></div>'
+    +'<div class="ig"><label>N° RLS eletti</label><input type="number" id="sic-rls" placeholder="1"/></div>'
+    +'<div class="ig"><label>N° riunioni periodiche (art.35)</label><input type="number" id="sic-riunioni" placeholder="1"/></div>'
+    +'<div class="ig"><label>DVR aggiornato (1=Sì)</label><input type="number" id="sic-dvr" value="1" min="0" max="1"/></div>'
+    +'<div class="ig"><label>Piano emergenza aggiornato (1=Sì)</label><input type="number" id="sic-pe" value="1" min="0" max="1"/></div>'
+    +'<div class="ig"><label>N° NC sicurezza rilevate</label><input type="number" id="sic-nc" placeholder="0"/></div>'
+    +'<div class="ig"><label>Costo totale DPI (€)</label><input type="number" id="sic-dpi" placeholder="0"/></div>'
+    +'</div>'
+    +'<hr class="div">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">'
+    +'<p class="stitle" style="margin:0">Registro infortuni</p>'
+    +'<button class="bs" style="font-size:12px;padding:5px 12px" onclick="addInfortunio()">+ Aggiungi infortunio</button>'
+    +'</div>'
+    +'<div id="inf-list"></div>'
+    +'<div id="inf-kpi" style="margin-top:.75rem"></div>';
+}
+
+function initInfortuni(){renderInfortuni();}
+
+function addInfortunio(){
+  infortuni_list.push({id:Date.now(),data:'',tipo:'luogo',genere:'M',eta:'',mansione:'',rep:'',giorni:'',dinamica:'',natura:'',partecorp:'',agente:'',prognosi:'',mortale:false});
+  renderInfortuni();
+}
+
+function deleteInfortunio(id){
+  infortuni_list=infortuni_list.filter(function(x){return x.id!==id;});
+  renderInfortuni();
+}
+
+function renderInfortuni(){
+  var c=document.getElementById('inf-list');
+  if(!c)return;
+  if(infortuni_list.length===0){c.innerHTML='<p style="font-size:13px;color:var(--ink2);padding:8px 0">Nessun infortunio registrato. Clicca "+ Aggiungi infortunio" per inserirne uno.</p>';calcInfKPI();return;}
+  var html='';
+  infortuni_list.forEach(function(inf,i){
+    html+='<div class="inf-row" id="inf-row-'+inf.id+'">'
+      +'<button class="del-btn inf-del" onclick="deleteInfortunio('+inf.id+')" style="position:absolute;top:8px;right:8px" title="Elimina">×</button>'
+      +'<div class="ig"><label>N° infortunio</label><div style="font-size:13px;font-weight:600;padding-top:8px">#'+(i+1)+'</div></div>'
+      +'<div class="ig"><label>Data infortunio *</label><input type="date" onchange="updateInf('+inf.id+',\'data\',this.value)" value="'+inf.data+'"/></div>'
+      +'<div class="ig"><label>Luogo *</label>'
+      +'<select onchange="updateInf('+inf.id+',\'tipo\',this.value)">'
+      +'<option value="luogo"'+(inf.tipo==='luogo'?' selected':'')+'>Sul lavoro</option>'
+      +'<option value="itinere"'+(inf.tipo==='itinere'?' selected':'')+'>In itinere</option>'
+      +'</select></div>'
+      +'<div class="ig"><label>Genere</label>'
+      +'<select onchange="updateInf('+inf.id+',\'genere\',this.value)">'
+      +'<option value="M"'+(inf.genere==='M'?' selected':'')+'>Maschio</option>'
+      +'<option value="F"'+(inf.genere==='F'?' selected':'')+'>Femmina</option>'
+      +'</select></div>'
+      +'<div class="ig"><label>Età infortunato</label><input type="number" placeholder="35" min="15" max="75" value="'+inf.eta+'" onchange="updateInf('+inf.id+',\'eta\',this.value)"/></div>'
+      +'<div class="ig"><label>Mansione</label><input type="text" placeholder="Es. Operatore" value="'+inf.mansione+'" onchange="updateInf('+inf.id+',\'mansione\',this.value)"/></div>'
+      +'<div class="ig"><label>Reparto/Area</label><input type="text" placeholder="Es. Produzione" value="'+inf.rep+'" onchange="updateInf('+inf.id+',\'rep\',this.value)"/></div>'
+      +'<div class="ig"><label>Giorni di assenza *</label><input type="number" placeholder="0" min="0" value="'+inf.giorni+'" onchange="updateInf('+inf.id+',\'giorni\',this.value)"/></div>'
+      +'<div class="ig"><label>Natura lesione</label>'
+      +'<select onchange="updateInf('+inf.id+',\'natura\',this.value)">'
+      +['','Ferita','Contusione','Frattura','Distorsione/lussazione','Ustione','Lesione interna','Intossicazione','Malattia professionale','Altro'].map(function(v){return'<option value="'+v+'"'+(inf.natura===v?' selected':'')+'>'+( v||'— seleziona —')+'</option>';}).join('')
+      +'</select></div>'
+      +'<div class="ig"><label>Parte del corpo</label>'
+      +'<select onchange="updateInf('+inf.id+',\'partecorp\',this.value)">'
+      +['','Testa/cranio','Occhi','Collo','Spalla','Braccio','Mano/dita','Schiena/colonna','Addome','Gamba','Piede/dita piede','Più parti','Altro'].map(function(v){return'<option value="'+v+'"'+(inf.partecorp===v?' selected':'')+'>'+( v||'— seleziona —')+'</option>';}).join('')
+      +'</select></div>'
+      +'<div class="ig"><label>Agente causale</label>'
+      +'<select onchange="updateInf('+inf.id+',\'agente\',this.value)">'
+      +['','Macchinari/impianti','Utensili manuali','Sostanze chimiche','Caduta dall\'alto','Caduta piano','Investimento veicolo','Movimentazione manuale carichi','Elettricità','Incendio/esplosione','Agenti biologici','Altro'].map(function(v){return'<option value="'+v+'"'+(inf.agente===v?' selected':'')+'>'+( v||'— seleziona —')+'</option>';}).join('')
+      +'</select></div>'
+      +'<div class="ig"><label>Dinamica / descrizione</label><input type="text" placeholder="Breve descrizione…" value="'+inf.dinamica+'" onchange="updateInf('+inf.id+',\'dinamica\',this.value)"/></div>'
+      +'<div class="ig"><label>Prognosi (gg)</label><input type="number" placeholder="0" min="0" value="'+inf.prognosi+'" onchange="updateInf('+inf.id+',\'prognosi\',this.value)"/></div>'
+      +'<div class="ig"><label>Esito mortale</label>'
+      +'<select onchange="updateInf('+inf.id+',\'mortale\',this.value===\'1\')">'
+      +'<option value="0"'+(inf.mortale?'':' selected')+'>No</option>'
+      +'<option value="1"'+(inf.mortale?' selected':'')+'>Sì</option>'
+      +'</select></div>'
+      +'</div>';
+  });
+  c.innerHTML=html;
+  calcInfKPI();
+}
+
+function updateInf(id,field,val){
+  infortuni_list.forEach(function(x){if(x.id===id)x[field]=val;});
+  calcInfKPI();
+}
+
+function calcInfKPI(){
+  var c=document.getElementById('inf-kpi');if(!c)return;
+  var n=infortuni_list.length;
+  var gg=infortuni_list.reduce(function(a,x){return a+(parseFloat(x.giorni)||0);},0);
+  var mort=infortuni_list.filter(function(x){return x.mortale;}).length;
+  var ore=parseFloat((document.getElementById('sic-ore')||{value:'52000'}).value)||52000;
+  var emp=parseFloat((document.getElementById('employees')||{value:'25'}).value)||1;
+  var tf= ore>0?(n/ore*1000000).toFixed(2):0;
+  var tg= ore>0?(gg/ore*1000).toFixed(2):0;
+  var inc=(n/emp*1000).toFixed(2);
+  c.innerHTML='<p class="stitle" style="margin-top:.5rem">Indici INAIL calcolati</p>'
+    +'<div class="g4">'
+    +'<div class="mc"><p class="ml">N° infortuni totali</p><p class="mv">'+n+'</p></div>'
+    +'<div class="mc"><p class="ml">Giorni totali assenza</p><p class="mv">'+gg+'</p></div>'
+    +'<div class="mc"><p class="ml">Tasso Frequenza (×10⁶)</p><p class="mv">'+tf+'</p></div>'
+    +'<div class="mc"><p class="ml">Tasso Gravità (×10³)</p><p class="mv">'+tg+'</p></div>'
+    +'<div class="mc"><p class="ml">Incidenza (×1000 dip.)</p><p class="mv">'+inc+'</p></div>'
+    +'<div class="mc"><p class="ml">Infortuni mortali</p><p class="mv" style="color:'+(mort>0?'var(--rt)':'var(--gt)')+'">'+mort+'</p></div>'
+    +'</div>';
+}
+
+// ─── FORMAZIONE ───────────────────────────────────────────────────
+function buildFormazioneHTML(){
+  return '<div class="g4">'
+    +'<div class="ig"><label>Ore formazione sicurezza erogate</label><input type="number" id="for-sic" placeholder="120" min="0"/></div>'
+    +'<div class="ig"><label>Ore formazione sicurezza previste</label><input type="number" id="for-sic-prev" placeholder="140" min="0"/></div>'
+    +'<div class="ig"><label>Ore totali formazione (tutte)</label><input type="number" id="for-tot" placeholder="300" min="0"/></div>'
+    +'<div class="ig"><label>Ore formazione per dipendente</label><input type="number" id="for-dip" placeholder="12" step="0.5" min="0"/></div>'
+    +'<div class="ig"><label>Spesa formazione (€)</label><input type="number" id="for-spesa" placeholder="5000" min="0"/></div>'
+    +'<div class="ig"><label>N° corsi erogati</label><input type="number" id="for-corsi" placeholder="8" min="0"/></div>'
+    +'<div class="ig"><label>N° dipendenti formati</label><input type="number" id="for-pers" placeholder="25" min="0"/></div>'
+    +'<div class="ig"><label>N° certificati/abilitazioni ottenute</label><input type="number" id="for-cert" placeholder="5" min="0"/></div>'
+    +'</div>'
+    +'<hr class="div">'
+    +'<p class="stitle">Tipologie di formazione</p>'
+    +'<div class="g4">'
+    +'<div class="ig"><label>Formazione obbligatoria ex D.Lgs 81 (ore)</label><input type="number" id="for-81" placeholder="80" min="0"/></div>'
+    +'<div class="ig"><label>Aggiornamento periodico (ore)</label><input type="number" id="for-agg" placeholder="40" min="0"/></div>'
+    +'<div class="ig"><label>Formazione manageriale (ore)</label><input type="number" id="for-mgr" placeholder="24" min="0"/></div>'
+    +'<div class="ig"><label>Formazione tecnica/professionale (ore)</label><input type="number" id="for-tec" placeholder="80" min="0"/></div>'
+    +'<div class="ig"><label>Formazione ambientale (ore)</label><input type="number" id="for-amb" placeholder="16" min="0"/></div>'
+    +'<div class="ig"><label>Formazione linguistica (ore)</label><input type="number" id="for-ling" placeholder="0" min="0"/></div>'
+    +'<div class="ig"><label>E-learning (ore)</label><input type="number" id="for-elearn" placeholder="20" min="0"/></div>'
+    +'<div class="ig"><label>Coaching/mentoring (ore)</label><input type="number" id="for-coach" placeholder="0" min="0"/></div>'
+    +'</div>';
+}
+
+// ─── AUDIT ────────────────────────────────────────────────────────
+function buildAuditHTML(){
+  return '<div class="g4">'
+    +'<div class="ig"><label>N° audit interni eseguiti</label><input type="number" id="aud-int" placeholder="4" min="0"/></div>'
+    +'<div class="ig"><label>N° audit esterni subiti</label><input type="number" id="aud-ext" placeholder="2" min="0"/></div>'
+    +'<div class="ig"><label>N° non conformità (NC) rilevate</label><input type="number" id="aud-nc" placeholder="3" min="0"/></div>'
+    +'<div class="ig"><label>N° NC chiuse nei tempi</label><input type="number" id="aud-nc-ok" placeholder="3" min="0"/></div>'
+    +'<div class="ig"><label>N° azioni correttive (AC) aperte</label><input type="number" id="aud-ac" placeholder="1" min="0"/></div>'
+    +'<div class="ig"><label>N° azioni preventive (AP) aperte</label><input type="number" id="aud-ap" placeholder="0" min="0"/></div>'
+    +'<div class="ig"><label>N° osservazioni rilevate</label><input type="number" id="aud-oss" placeholder="5" min="0"/></div>'
+    +'<div class="ig"><label>N° ispezioni enti terzi (ASL, ARPA…)</label><input type="number" id="aud-isp" placeholder="1" min="0"/></div>'
+    +'<div class="ig"><label>N° prescrizioni ricevute</label><input type="number" id="aud-pres" placeholder="0" min="0"/></div>'
+    +'<div class="ig"><label>N° sanzioni (€) ricevute</label><input type="number" id="aud-san" placeholder="0" min="0"/></div>'
+    +'</div>'
+    +'<hr class="div">'
+    +'<p class="stitle">Certificazioni attive</p>'
+    +'<div class="g4">'
+    +'<div class="ig"><label>ISO 9001 Qualità (1=Sì)</label><input type="number" id="cert-9001" value="0" min="0" max="1"/></div>'
+    +'<div class="ig"><label>ISO 14001 Ambiente (1=Sì)</label><input type="number" id="cert-14001" value="0" min="0" max="1"/></div>'
+    +'<div class="ig"><label>ISO 45001 Sicurezza (1=Sì)</label><input type="number" id="cert-45001" value="0" min="0" max="1"/></div>'
+    +'<div class="ig"><label>ISO 50001 Energia (1=Sì)</label><input type="number" id="cert-50001" value="0" min="0" max="1"/></div>'
+    +'<div class="ig"><label>SA8000 (1=Sì)</label><input type="number" id="cert-sa8000" value="0" min="0" max="1"/></div>'
+    +'<div class="ig"><label>Modello 231 (1=Sì)</label><input type="number" id="cert-231" value="0" min="0" max="1"/></div>'
+    +'</div>';
+}
+
+// ─── AMMINISTRATIVI ───────────────────────────────────────────────
+function buildAmmHTML(){
+  return '<div class="g4">'
+    +'<div class="ig"><label>Fatturato (€)</label><input type="number" id="amm-fatt" placeholder="2500000" min="0"/></div>'
+    +'<div class="ig"><label>Investimenti ESG (€)</label><input type="number" id="amm-esg" placeholder="50000" min="0"/></div>'
+    +'<div class="ig"><label>Costi gestione ambientale (€)</label><input type="number" id="amm-amb" placeholder="25000" min="0"/></div>'
+    +'<div class="ig"><label>Costi sicurezza (€)</label><input type="number" id="amm-sic" placeholder="18000" min="0"/></div>'
+    +'<div class="ig"><label>Spesa fornitori locali (&lt;100 km) (€)</label><input type="number" id="amm-forn" placeholder="300000" min="0"/></div>'
+    +'<div class="ig"><label>N° fornitori attivi</label><input type="number" id="amm-nforn" placeholder="45" min="0"/></div>'
+    +'<div class="ig"><label>N° fornitori valutati su ESG</label><input type="number" id="amm-fornESG" placeholder="12" min="0"/></div>'
+    +'<div class="ig"><label>Donazioni/sponsor solidali (€)</label><input type="number" id="amm-don" placeholder="0" min="0"/></div>'
+    +'</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SEDI OPERATIVE
+// ═══════════════════════════════════════════════════════════════════
+var sedi_op=[];
+function addSedeOp(){
+  var id=Date.now();
+  sedi_op.push({id:id,via:'',cap:'',citta:'',prov:'',tipo:''});
+  renderSediOp();
+}
+function deleteSedeOp(id){sedi_op=sedi_op.filter(function(s){return s.id!==id;});renderSediOp();}
+function renderSediOp(){
+  var c=document.getElementById('sedi-op-list');if(!c)return;
+  if(sedi_op.length===0){c.innerHTML='<p style="font-size:13px;color:var(--ink2);padding:6px 0">Nessuna sede operativa aggiunta.</p>';return;}
+  c.innerHTML=sedi_op.map(function(s,i){
+    return '<div style="display:grid;grid-template-columns:2fr 70px 1fr 60px 1fr auto;gap:7px;margin-bottom:7px;align-items:end;">'
+      +'<div class="ig"><label>Via / N°</label><input type="text" value="'+s.via+'" placeholder="Via Industria 5" onchange="updateSedeOp('+s.id+',\'via\',this.value)"/></div>'
+      +'<div class="ig"><label>CAP</label><input type="text" value="'+s.cap+'" maxlength="5" placeholder="41122" onchange="updateSedeOp('+s.id+',\'cap\',this.value)"/></div>'
+      +'<div class="ig"><label>Città</label><input type="text" value="'+s.citta+'" placeholder="Modena" onchange="updateSedeOp('+s.id+',\'citta\',this.value)"/></div>'
+      +'<div class="ig"><label>Prov.</label><input type="text" value="'+s.prov+'" maxlength="2" placeholder="MO" style="text-transform:uppercase" onchange="updateSedeOp('+s.id+',\'prov\',this.value)"/></div>'
+      +'<div class="ig"><label>Tipo</label><select onchange="updateSedeOp('+s.id+',\'tipo\',this.value)"><option value="">— tipo —</option><option value="prod">Produzione</option><option value="amm">Amministrativa</option><option value="magazz">Magazzino</option><option value="negozio">Punto vendita</option><option value="cantiere">Cantiere</option><option value="altro">Altro</option></select></div>'
+      +'<div><button class="del-btn" onclick="deleteSedeOp('+s.id+')" style="margin-bottom:6px" title="Elimina sede">×</button></div>'
+      +'</div>';
+  }).join('');
+}
+function updateSedeOp(id,field,val){sedi_op.forEach(function(s){if(s.id===id)s[field]=val;});}
+
+// ═══════════════════════════════════════════════════════════════════
+// LOGO
+// ═══════════════════════════════════════════════════════════════════
+function loadLogo(input){
+  var file=input.files[0]; if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var src=e.target.result;
+    var pm=document.getElementById('logo-preview-main');
+    var pph=document.getElementById('logo-placeholder-main');
+    var ph=document.getElementById('logo-placeholder');
+    var ph2=document.getElementById('logo-preview-header');
+    if(pm){pm.src=src;pm.style.display='block';if(pph)pph.style.display='none';}
+    if(ph){ph.style.display='none';}
+    if(ph2){ph2.src=src;ph2.style.display='block';}
+    // sincronizza con secondo input
+    document.getElementById('logo-file').files=input.files;
+    document.getElementById('logo-file-main').files=input.files;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TABS & ACCORDION
+// ═══════════════════════════════════════════════════════════════════
+function toggleCard(header){
+  var card=header.parentElement;
+  card.classList.toggle('collapsed');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// i18n apply
+// ═══════════════════════════════════════════════════════════════════
+function applyTranslations(){
+  var m={'app-sub':'sub','tn-company':'tabCompany','tn-data':'tabData','tn-target':'tabTarget','tn-kpi':'tabKpi','tn-import':'tabImport',
+    'btn-calc':'btnCalc','btn-apply':'btnApply','lbl-conv':'conv','lbl-andamento':'andamento','lbl-dist':'dist','lbl-perf':'perf'};
+  Object.keys(m).forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=T(m[id]);});
+}
+function changeLang(lang){CL=lang;applyTranslations();buildDataPanel();calcKPI();}
+
+// ═══════════════════════════════════════════════════════════════════
+// SYNC COMPANY NAME
+// ═══════════════════════════════════════════════════════════════════
+function syncCompanyName(){
+  var v=(document.getElementById('a-ragione')||{}).value||'';
+  var h=document.getElementById('header-company');
+  if(h) h.textContent=v||'Sustainability KPI';
+}
+function saveCompany(){syncCompanyName();}
+
+// ═══════════════════════════════════════════════════════════════════
+// TARGETS
+// ═══════════════════════════════════════════════════════════════════
+var TARGETS=[
+  {id:'kwh',label:'Consumo totale annuo',val:80000,um:'kWh',bl:98000},
+  {id:'tep',label:'TEP totali',val:38,um:'TEP',bl:44},
+  {id:'co2',label:'Emissioni CO₂eq',val:18,um:'ton',bl:23},
+  {id:'intens',label:'Intensità energetica',val:3200,um:'kWh/dip',bl:3900},
+  {id:'rid',label:'Riduzione consumi',val:-10,um:'%',bl:0},
+  {id:'rin',label:'% Energia rinnovabile',val:30,um:'%',bl:10},
+];
+
+function buildTargetRows(){
+  var c=document.getElementById('target-rows');if(!c)return;c.innerHTML='';
+  TARGETS.forEach(function(tg){
+    var row=document.createElement('div');row.className='trow';
+    row.innerHTML='<div><label style="font-size:13px;font-weight:500;color:var(--ink)">'+tg.label+'</label></div>'
+      +'<div><label>Valore</label><input type="number" id="tgv-'+tg.id+'" value="'+tg.val+'" onchange="saveTG(\''+tg.id+'\')"/></div>'
+      +'<div><label>Unità</label><input type="text" id="tgu-'+tg.id+'" value="'+tg.um+'" onchange="saveTG(\''+tg.id+'\')" style="font-size:13px"/></div>'
+      +'<div><label>Baseline</label><input type="number" id="tgb-'+tg.id+'" value="'+tg.bl+'" onchange="saveTG(\''+tg.id+'\')"/></div>';
+    c.appendChild(row);
+  });
+}
+function saveTG(id){TARGETS.forEach(function(tg){if(tg.id===id){var v=document.getElementById('tgv-'+id);var u=document.getElementById('tgu-'+id);var b=document.getElementById('tgb-'+id);if(v)tg.val=parseFloat(v.value)||tg.val;if(u)tg.um=u.value||tg.um;if(b)tg.bl=parseFloat(b.value)||tg.bl;}});}
+function getTG(id){for(var i=0;i<TARGETS.length;i++)if(TARGETS[i].id===id)return TARGETS[i];return null;}
+
+// ═══════════════════════════════════════════════════════════════════
+// PRESETS
+// ═══════════════════════════════════════════════════════════════════
+var PRESETS={
+  green:{c1:'#2d6a4f',c2:'#40916c',c3:'#74c69d',c4:'#b7e4c7',ct:'#e63946',cb:'#adb5bd'},
+  blue: {c1:'#1d3557',c2:'#457b9d',c3:'#a8dadc',c4:'#f1faee',ct:'#e63946',cb:'#6c757d'},
+  warm: {c1:'#9b2226',c2:'#ae2012',c3:'#ca6702',c4:'#ee9b00',ct:'#0077b6',cb:'#adb5bd'}
+};
+function applyPreset(n){var p=PRESETS[n];['c1','c2','c3','c4','ct','cb'].forEach(function(k){var el=document.getElementById(k);if(el)el.value=p[k];});calcKPI();}
+function getColors(){return[document.getElementById('c1').value,document.getElementById('c2').value,document.getElementById('c3').value,document.getElementById('c4').value];}
+function getCT(){return document.getElementById('ct').value;}
+function getCB(){return document.getElementById('cb').value;}
+
+// ═══════════════════════════════════════════════════════════════════
+// CALC KPI
+// ═══════════════════════════════════════════════════════════════════
+var barInst=null,pieInst=null;
+function getMonthlyData(){var d=[];for(var i=0;i<12;i++){var el=document.getElementById('m'+i);d.push(el?parseFloat(el.value)||0:0);}return d;}
+function setCards(id,items){var c=document.getElementById(id);if(!c)return;c.innerHTML='';items.forEach(function(item){c.innerHTML+='<div class="mc"><p class="ml">'+item.label+'</p><p class="mv">'+item.val+' <span class="mu">'+item.unit+'</span></p></div>';});}
+
+// ═══════════════════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════════════════
+function drawTrendChart(data,target,prev){
+  var ctx=document.getElementById('barChart');if(!ctx)return;
+  if(barInst)barInst.destroy();
+  var cols=getColors();var ct=getCT();var cb=getCB();
+  var ms=T('months');
+  var sr=document.getElementById('show-refs').value;
+  var ctt=document.getElementById('chart-type-trend').value;
+  var mt=ctt==='line'?'line':'bar';
+  var ds=[{label:'kWh',data:data,backgroundColor:cols[0]+(mt==='bar'?'dd':'33'),borderColor:cols[0],borderWidth:mt==='line'?2:0,borderRadius:mt==='bar'?4:0,fill:mt==='line',tension:.35,pointRadius:mt==='line'?3:0}];
+  if(ctt==='bar+line')ds.push({type:'line',label:'Andamento',data:data,borderColor:cols[1],backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.35,fill:false});
+  if(sr==='both'||sr==='target')ds.push({type:'line',label:'Target mensile',data:Array(12).fill(Math.round(target/12)),borderColor:ct,backgroundColor:'transparent',borderWidth:2,borderDash:[7,4],pointRadius:0});
+  if(sr==='both'||sr==='baseline')ds.push({type:'line',label:'Baseline mensile',data:Array(12).fill(Math.round(prev/12)),borderColor:cb,backgroundColor:'transparent',borderWidth:2,borderDash:[4,4],pointRadius:0});
+  barInst=new Chart(ctx,{type:mt,data:{labels:ms,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{font:{size:11},boxWidth:14}}},scales:{x:{ticks:{font:{size:11},autoSkip:false,maxRotation:45}},y:{ticks:{font:{size:11},callback:function(v){return v.toLocaleString();}}}}}});
+}
+
+function drawDistChart(q){
+  var ctx=document.getElementById('pieChart');if(!ctx)return;
+  if(pieInst)pieInst.destroy();
+  var cols=getColors();var total=q.reduce(function(a,b){return a+b;},0);
+  var ql=T('q');
+  var legend=document.getElementById('pie-legend');legend.innerHTML='';
+  for(var i=0;i<4;i++){var pct=total>0?(q[i]/total*100).toFixed(0):0;legend.innerHTML+='<span class="pli"><span class="pd" style="background:'+cols[i]+'"></span>'+ql[i]+' '+pct+'%</span>';}
+  var ctd=document.getElementById('chart-type-dist').value;
+  if(ctd==='bar'){pieInst=new Chart(ctx,{type:'bar',data:{labels:ql,datasets:[{label:'kWh',data:q,backgroundColor:cols,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:function(v){return v.toLocaleString();},font:{size:11}}},y:{ticks:{font:{size:11}}}}}});}
+  else{pieInst=new Chart(ctx,{type:ctd,data:{labels:ql,datasets:[{data:q,backgroundColor:cols,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});}
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SPEEDOMETER rosso→giallo→verde
+// ═══════════════════════════════════════════════════════════════════
+function drawSpeedometers(vsTarget,vsPrec,perEmp){
+  var c=document.getElementById('speedometers');if(!c)return;c.innerHTML='';
+  var tgInt=getTG('intens');var intTarget=tgInt?tgInt.val:3500;
+  var indicators=[{label:T('effic'),value:vsTarget,invert:true,lo:-5,hi:5},{label:T('riduz'),value:vsPrec,invert:true,lo:-5,hi:0},{label:T('intens'),value:perEmp/100,invert:true,lo:intTarget/100*0.8,hi:intTarget/100*1.2}];
+  indicators.forEach(function(ind){
+    var s=getStatus(ind.value,ind.lo,ind.hi,ind.invert);
+    var wrap=document.createElement('div');wrap.className='sw';
+    wrap.innerHTML=makeSVGGauge(ind.value,ind.lo,ind.hi,ind.invert)+'<p class="sn">'+ind.label+'</p><span class="sb s'+s.cls+'">'+s.label+'</span>';
+    c.appendChild(wrap);
+  });
+}
+function getStatus(val,lo,hi,invert){var good=invert?val<=lo:val>=hi;var bad=invert?val>=hi:val<=lo;if(good)return{cls:'g',label:T('ottimo')};if(bad)return{cls:'r',label:T('critico')};return{cls:'a',label:T('norma')};}
+function makeSVGGauge(value,lo,hi,invert){
+  var range=Math.abs(hi-lo)*3||30;var mid=(lo+hi)/2;
+  var pct=invert?Math.max(0,Math.min(100,((mid+range/2)-value)/range*100)):Math.max(0,Math.min(100,(value-(mid-range/2))/range*100));
+  var angle=(-135+pct/100*270)*Math.PI/180;
+  var nx=(60+44*Math.cos(angle)).toFixed(1);var ny=(60+44*Math.sin(angle)).toFixed(1);
+  var ARC=138.2;var seg=(ARC/3).toFixed(1);
+  var nc=pct<33?'#C62828':(pct<66?'#E65100':'#2E7D32');
+  var sign=value>=0?'+':'';
+  return '<svg viewBox="0 0 120 92" width="140" height="92" aria-hidden="true">'
+    +'<path d="M18,70 A44,44 0 1,1 102,70" fill="none" stroke="#e0dfda" stroke-width="11" stroke-linecap="butt"/>'
+    +'<path d="M18,70 A44,44 0 1,1 102,70" fill="none" stroke="#E53935" stroke-width="11" stroke-linecap="butt" stroke-dasharray="'+seg+' '+ARC+'" stroke-dashoffset="0"/>'
+    +'<path d="M18,70 A44,44 0 1,1 102,70" fill="none" stroke="#FB8C00" stroke-width="11" stroke-linecap="butt" stroke-dasharray="'+seg+' '+ARC+'" stroke-dashoffset="-'+seg+'"/>'
+    +'<path d="M18,70 A44,44 0 1,1 102,70" fill="none" stroke="#43A047" stroke-width="11" stroke-linecap="butt" stroke-dasharray="'+seg+' '+ARC+'" stroke-dashoffset="-'+(parseFloat(seg)*2).toFixed(1)+'"/>'
+    +'<line x1="60" y1="60" x2="'+nx+'" y2="'+ny+'" stroke="'+nc+'" stroke-width="2.5" stroke-linecap="round"/>'
+    +'<circle cx="60" cy="60" r="5" fill="'+nc+'" stroke="#fff" stroke-width="1.5"/>'
+    +'<text x="60" y="84" text-anchor="middle" font-size="10.5" fill="'+nc+'" font-weight="700" font-family="system-ui,sans-serif">'+sign+value.toFixed(1)+'%</text>'
+    +'<text x="14" y="80" font-size="8" fill="#E53935" font-family="system-ui,sans-serif">▼</text>'
+    +'<text x="102" y="80" font-size="8" fill="#43A047" font-family="system-ui,sans-serif">▲</text>'
+    +'</svg>';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// IMPORT
+// ═══════════════════════════════════════════════════════════════════
+function handleFile(file){
+  if(!file)return;var sd=document.getElementById('import-status');
+  sd.className='sm';sd.innerHTML='Analisi in corso…';sd.style.display='block';
+  var reader=new FileReader();reader.readAsArrayBuffer(file);
+  reader.onload=function(e){
+    try{
+      var data=new Uint8Array(e.target.result);var wb=XLSX.read(data,{type:'array'});
+      var ws=wb.Sheets[wb.SheetNames[0]];var rows=XLSX.utils.sheet_to_json(ws,{header:1});
+      var tmp=[];
+      for(var r=1;r<=12;r++){if(!rows[r]||rows[r][1]===undefined)throw new Error('Manca il valore alla riga '+(r+1));var v=parseFloat(rows[r][1]);if(isNaN(v)||v<0)throw new Error('Valore non valido alla riga '+(r+1));tmp.push(Math.round(v));}
+      for(var i=0;i<12;i++){var inp=document.getElementById('m'+i);if(inp)inp.value=tmp[i];}
+      sd.className='sm ss';sd.innerHTML='✅ <b>'+file.name+'</b> importato!';
+      calcKPI();setTimeout(function(){sw('data');},1500);
+    }catch(err){sd.className='sm se';sd.innerHTML='❌ <b>Errore:</b> '+err.message;}
+  };
+}
+var dz=document.getElementById('drop-zone');
+['dragenter','dragover'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.add('dg');});});
+['dragleave','drop'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.remove('dg');});});
+dz.addEventListener('drop',function(e){handleFile(e.dataTransfer.files[0]);});
+
+// ═══════════════════════════════════════════════════════════════════
+// XLSX TEMPLATE
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// OVERRIDE sw() — gestisce tab scadenziario
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Override sw() per includere tab scadenziario ──────────────────────────
+function sw(name) {
+  ['company','data','target','kpi','import','scad'].forEach(function(n) {
+    var p = document.getElementById('panel-' + n);
+    var t = document.getElementById('tab-' + n);
+    if (p) p.classList.remove('active');
+    if (t) t.classList.remove('active');
+  });
+  var ap = document.getElementById('panel-' + name);
+  var at = document.getElementById('tab-'   + name);
+  if (ap) ap.classList.add('active');
+  if (at) at.classList.add('active');
+}
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MODULI EXTRA — Acqua, Gasolio/Gas, Rifiuti, Indici Sicurezza, PWA, Password
+// ════════════════════════════════════════════════════════════════════════════
+
+// =========================================================================
+// MODULI AGGIUNTIVI — ACQUA, GASOLIO/GAS, RIFIUTI completi, Indici Sicurezza
+// =========================================================================
+
+// ── Acqua ─────────────────────────────────────────────────────────────────
+function buildAcquaHTML() {
+  var ms = T('months');
+  var mi = '';
+  for (var i = 0; i < 12; i++)
+    mi += '<div class="ig"><label>' + ms[i] + '</label><input type="number" id="acqua-m' + i + '" placeholder="0" min="0"/></div>';
+  return '<p class="stitle">Consumi acqua da rete (m³/anno)</p>'
+    + '<div class="g4">'
+    + '<div class="ig"><label>Acqua da rete idrica (m³/anno) *</label><input type="number" id="acqua-rete" placeholder="2500" min="0" onchange="calcKPI()"/></div>'
+    + '<div class="ig"><label>Acqua da pozzo / falda (m³)</label><input type="number" id="acqua-pozzo" placeholder="0" min="0"/></div>'
+    + '<div class="ig"><label>Acqua scaricata — reflui (m³)</label><input type="number" id="acqua-scarico" placeholder="2200" min="0"/></div>'
+    + '<div class="ig"><label>Acqua riutilizzata (m³)</label><input type="number" id="acqua-riuso" placeholder="0" min="0"/></div>'
+    + '<div class="ig"><label>Costo fornitura idrica (€)</label><input type="number" id="acqua-costo" placeholder="3200" min="0"/></div>'
+    + '<div class="ig"><label>Costo depurazione (€)</label><input type="number" id="acqua-dep" placeholder="800" min="0"/></div>'
+    + '<div class="ig"><label>N° scarichi autorizzati</label><input type="number" id="acqua-aut" placeholder="1" min="0"/></div>'
+    + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Consumi mensili acqua (m³)</p>'
+    + '<div class="g6">' + mi + '</div>';
+}
+
+// ── Gasolio & Gas ─────────────────────────────────────────────────────────
+function buildGasolioBenzHTML() {
+  var ms = T('months');
+  var gasD  = [420,390,380,310,290,260,250,260,280,330,390,430];
+  var gasoD = [180,170,175,195,210,230,240,225,200,185,175,160];
+  var gasRow = '', gasoRow = '', benzRow = '';
+  for (var i = 0; i < 12; i++) {
+    gasRow  += '<div class="ig"><label>' + ms[i] + '</label><input type="number" id="gas-m'    + i + '" value="' + gasD[i]  + '" min="0" onchange="calcCombustibili()"/></div>';
+    gasoRow += '<div class="ig"><label>' + ms[i] + '</label><input type="number" id="gasolio-m' + i + '" value="' + gasoD[i] + '" min="0" onchange="calcCombustibili()"/></div>';
+    benzRow += '<div class="ig"><label>' + ms[i] + '</label><input type="number" id="benz-m'   + i + '" value="0" min="0"/></div>';
+  }
+  return '<p class="stitle">Gas naturale (Sm³/mese)</p>'
+    + '<div class="g6">' + gasRow + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Gasolio — automezzi e macchinari (L/mese)</p>'
+    + '<div class="g6">' + gasoRow + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Benzina automezzi (L/mese)</p>'
+    + '<div class="g6">' + benzRow + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Totali annui combustibili</p>'
+    + '<div class="g4">'
+    + '<div class="mc"><p class="ml">Gas totale (Sm³)</p><p class="mv" id="gas-tot">—</p></div>'
+    + '<div class="mc"><p class="ml">Gas → kWh equiv. (×10,55)</p><p class="mv" id="gas-kwh">—</p></div>'
+    + '<div class="mc"><p class="ml">Gasolio totale (L)</p><p class="mv" id="gasolio-tot">—</p></div>'
+    + '<div class="mc"><p class="ml">Gasolio → kWh equiv. (×9,97)</p><p class="mv" id="gasolio-kwh">—</p></div>'
+    + '</div>';
+}
+
+function calcCombustibili() {
+  var gasT = 0, gasoT = 0;
+  for (var i = 0; i < 12; i++) {
+    gasT  += parseFloat((document.getElementById('gas-m' + i)     || {value:0}).value) || 0;
+    gasoT += parseFloat((document.getElementById('gasolio-m' + i) || {value:0}).value) || 0;
+  }
+  var set = function(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+  set('gas-tot',      gasT.toLocaleString('it-IT'));
+  set('gas-kwh',      Math.round(gasT * 10.55).toLocaleString('it-IT') + ' kWh');
+  set('gasolio-tot',  gasoT.toLocaleString('it-IT'));
+  set('gasolio-kwh',  Math.round(gasoT * 9.97).toLocaleString('it-IT') + ' kWh');
+}
+
+// ── Rifiuti completo (con indici immagini) ─────────────────────────────────
+function buildRifiutiHTML() {
+  return '<p class="stitle">Produzione rifiuti</p>'
+    + '<div class="g4">'
+    + '<div class="ig"><label>Rifiuti pericolosi prodotti (ton) *</label><input type="number" id="rif-peric" placeholder="0.5" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>Rifiuti non pericolosi (ton) *</label><input type="number" id="rif-nperic" placeholder="12" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="mc"><p class="ml">Totale rifiuti (ton)</p><p class="mv" id="rif-tot-val">—</p></div>'
+    + '<div class="mc"><p class="ml">% pericolosi / totale</p><p class="mv" id="rif-pct-peric">—</p></div>'
+    + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Gestione — Recupero (R) e Smaltimento (D)</p>'
+    + '<div class="g4">'
+    + '<div class="ig"><label>Avviati a recupero R (ton) *</label><input type="number" id="rif-rec" placeholder="10" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>Avviati a smaltimento D (ton) *</label><input type="number" id="rif-smalt" placeholder="2.5" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="mc"><p class="ml">% recupero su totale</p><p class="mv" id="rif-pct-rec">—</p></div>'
+    + '<div class="mc"><p class="ml">% smaltimento su totale</p><p class="mv" id="rif-pct-smalt">—</p></div>'
+    + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Dettaglio tipologie rifiuto</p>'
+    + '<div class="g4">'
+    + '<div class="ig"><label>Carta riciclata R3 (ton)</label><input type="number" id="rif-carta" placeholder="0" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>Recupero carta (€)</label><input type="number" id="rif-carta-euro" placeholder="0" min="0"/></div>'
+    + '<div class="ig"><label>Ferro/metalli R4 (ton)</label><input type="number" id="rif-ferro" placeholder="0" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>Recupero ferro (€)</label><input type="number" id="rif-ferro-euro" placeholder="0" min="0"/></div>'
+    + '<div class="ig"><label>Pallet R3 (ton)</label><input type="number" id="rif-pallet" placeholder="0" step="0.01" min="0"/></div>'
+    + '<div class="ig"><label>Rifiuto misto (ton)</label><input type="number" id="rif-misto" placeholder="0" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>EER 150101 — carta (ton)</label><input type="number" id="rif-eer1" placeholder="0" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>EER 150106 — misto (ton)</label><input type="number" id="rif-eer2" placeholder="0" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>EER 150103 — legno (ton)</label><input type="number" id="rif-eer3" placeholder="0" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>Altri EER (ton)</label><input type="number" id="rif-altri" placeholder="0" step="0.01" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="ig"><label>Sovvallo / scarti (ton)</label><input type="number" id="rif-sovv" placeholder="0" step="0.01" min="0"/></div>'
+    + '<div class="ig"><label>EoW prodotti (ton)</label><input type="number" id="rif-eow" placeholder="0" step="0.01" min="0"/></div>'
+    + '<div class="ig"><label>N° formulari FIR emessi</label><input type="number" id="rif-fir" placeholder="24" min="0"/></div>'
+    + '<div class="ig"><label>Costo gestione rifiuti (€)</label><input type="number" id="rif-costo" placeholder="4500" min="0"/></div>'
+    + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Indici calcolati — RIFIUTI (da immagine cliente)</p>'
+    + '<div class="g4" id="rif-kpi-cards"></div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Mobilità aziendale</p>'
+    + '<div class="g4">'
+    + '<div class="ig"><label>km navette aziendali sedi IT (km/anno)</label><input type="number" id="mob-navette" placeholder="0" min="0"/></div>'
+    + '<div class="ig"><label>km percorsi in treno (trasferte)</label><input type="number" id="mob-treno-km" placeholder="0" min="0"/></div>'
+    + '<div class="ig"><label>CO₂ risparmiata per km in treno (ton)</label><input type="number" id="mob-treno-co2" placeholder="0" step="0.001" min="0"/></div>'
+    + '<div class="ig"><label>N° dip. in smart working (media)</label><input type="number" id="mob-sw" placeholder="0" min="0"/></div>'
+    + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Indice energia — m³ gas / m² superficie sedi</p>'
+    + '<div class="g4">'
+    + '<div class="ig"><label>Superficie totale sedi (m²)</label><input type="number" id="sup-sedi" placeholder="1000" min="0" onchange="calcRifiuti()"/></div>'
+    + '<div class="mc"><p class="ml">m³ gas / m² superficie</p><p class="mv" id="ind-gas-mq">—</p></div>'
+    + '<div class="mc"><p class="ml">% Rinnovabili / Energia totale</p><p class="mv" id="ind-rin-pct">—</p></div>'
+    + '</div>';
+}
+
+function calcRifiuti() {
+  var g  = function(id) { return parseFloat((document.getElementById(id) || {value:0}).value) || 0; };
+  var s  = function(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+
+  var p    = g('rif-peric'), np = g('rif-nperic');
+  var rec  = g('rif-rec'),  sma = g('rif-smalt');
+  var misto = g('rif-misto');
+  var eer1 = g('rif-eer1'), eer2 = g('rif-eer2'), eer3 = g('rif-eer3'), altri = g('rif-altri');
+  var tot  = p + np;
+  var pctMisto  = rec > 0 ? (misto / rec * 100).toFixed(3) : '0.000';
+  var pctEER1   = rec > 0 ? (eer1  / rec * 100).toFixed(3) : '0.000';
+  var pctEER2   = rec > 0 ? (eer2  / rec * 100).toFixed(3) : '0.000';
+  var pctEER3   = rec > 0 ? (eer3  / rec * 100).toFixed(3) : '0.000';
+  var pctAltri  = rec > 0 ? (altri / rec * 100).toFixed(3) : '0.000';
+  var pctRecTot = tot > 0 ? (rec / tot * 100).toFixed(3) : '0.000';
+  var pctRicRec = rec > 0 ? (rec / rec * 100).toFixed(3) : '0.000';
+
+  s('rif-tot-val',   tot.toFixed(2) + ' ton');
+  s('rif-pct-peric', tot > 0 ? (p / tot * 100).toFixed(1) + '%' : '—');
+  s('rif-pct-rec',   tot > 0 ? (rec / tot * 100).toFixed(1) + '%' : '—');
+  s('rif-pct-smalt', tot > 0 ? (sma / tot * 100).toFixed(1) + '%' : '—');
+
+  var kc = document.getElementById('rif-kpi-cards');
+  if (kc) kc.innerHTML =
+    '<div class="mc"><p class="ml">Rif. recuperato totale / rif. prodotto ×100</p><p class="mv">' + pctRecTot + '%</p></div>'
+  + '<div class="mc"><p class="ml">Rif. riciclato totale / rif. recuperato ×100</p><p class="mv">' + pctRicRec + '%</p></div>'
+  + '<div class="mc"><p class="ml">Carta R3 / carta prodotta ×100</p><p class="mv"><input type="number" id="rif-carta-prod" style="width:80%;font-size:16px;background:transparent;border:none;border-bottom:.5px solid var(--bdm);outline:none" placeholder="0" step="0.01"/> %</p></div>'
+  + '<div class="mc"><p class="ml">Recupero carta (€) / carta riciclata ×100</p><p class="mv" id="ind-carta-euro">—</p></div>'
+  + '<div class="mc"><p class="ml">Ferro R4 / ferro prodotto ×100</p><p class="mv"><input type="number" id="rif-ferro-prod" style="width:80%;font-size:16px;background:transparent;border:none;border-bottom:.5px solid var(--bdm);outline:none" placeholder="0" step="0.01"/> %</p></div>'
+  + '<div class="mc"><p class="ml">Recupero ferro (€) / ferro riciclato ×100</p><p class="mv" id="ind-ferro-euro">—</p></div>'
+  + '<div class="mc"><p class="ml">Pallet R3 / pallet prodotto ×100</p><p class="mv"><input type="number" id="rif-pallet-prod" style="width:80%;font-size:16px;background:transparent;border:none;border-bottom:.5px solid var(--bdm);outline:none" placeholder="0" step="0.01"/> %</p></div>'
+  + '<div class="mc"><p class="ml">Rif. misto / rif. totale ×100</p><p class="mv">' + pctMisto + '%</p></div>'
+  + '<div class="mc"><p class="ml">EER 150101 / rif. recuperato ×100</p><p class="mv">' + pctEER1 + '%</p></div>'
+  + '<div class="mc"><p class="ml">EER 150106 / rif. recuperato ×100</p><p class="mv">' + pctEER2 + '%</p></div>'
+  + '<div class="mc"><p class="ml">EER 150103 / rif. recuperato ×100</p><p class="mv">' + pctEER3 + '%</p></div>'
+  + '<div class="mc"><p class="ml">Altri EER / rif. recuperato ×100</p><p class="mv">' + pctAltri + '%</p></div>';
+
+  // Calcolo €/tonnellata carta e ferro
+  var cartaRic = g('rif-carta'), cartaEuro = g('rif-carta-euro');
+  var ferroRic = g('rif-ferro'), ferroEuro = g('rif-ferro-euro');
+  s('ind-carta-euro', cartaRic > 0 ? (cartaEuro / cartaRic * 100).toFixed(2) + ' €/t' : '—');
+  s('ind-ferro-euro', ferroRic > 0 ? (ferroEuro / ferroRic * 100).toFixed(2) + ' €/t' : '—');
+
+  // m³ gas / m² superficie
+  var gasT = 0;
+  for (var i = 0; i < 12; i++) gasT += parseFloat((document.getElementById('gas-m' + i) || {value:0}).value) || 0;
+  var sup = g('sup-sedi');
+  s('ind-gas-mq', sup > 0 ? (gasT / sup).toFixed(3) + ' Sm³/m²' : '—');
+
+  // % rinnovabili
+  var fvAuto = parseFloat((document.getElementById('fv-auto') || {value:0}).value) || 0;
+  var data = []; for (var i = 0; i < 12; i++) { var el = document.getElementById('m' + i); data.push(el ? parseFloat(el.value) || 0 : 0); }
+  var totEE = data.reduce(function(a, b) { return a + b; }, 0);
+  s('ind-rin-pct', totEE > 0 ? (fvAuto / totEE * 100).toFixed(1) + '%' : '—');
+}
+
+// ── Indici sicurezza estesi (da immagini cliente) ──────────────────────────
+function buildSicurezzaKPIExtHTML() {
+  return '<hr class="div">'
+    + '<p class="stitle">Indici INAIL e sicurezza calcolati — Sezione INFORTUNI</p>'
+    + '<div class="g4" id="sic-kpi-ext">'
+    + '<div class="mc"><p class="ml">Incidenza: n°inf / n°dip medio ×1000</p><p class="mv" id="sic-ind-incid">0</p></div>'
+    + '<div class="mc"><p class="ml">Gravità: n°gg ass. × n°inf / n°inf tot.</p><p class="mv" id="sic-ind-grav">0</p></div>'
+    + '<div class="mc"><p class="ml">Indice sicurezza: n°ore ass. / ore lav. ×100</p><p class="mv" id="sic-ind-sic">0</p></div>'
+    + '<div class="mc"><p class="ml">Tasso frequenza: n°inf / ore lav. ×1.000.000</p><p class="mv" id="sic-ind-tf">0</p></div>'
+    + '<div class="mc"><p class="ml">Tasso gravità: gg perse / ore lav. ×1.000</p><p class="mv" id="sic-ind-tg">0</p></div>'
+    + '<div class="mc"><p class="ml">Inf. itinere / tot. ×100</p><p class="mv" id="sic-ind-itin-pct">0</p></div>'
+    + '<div class="mc"><p class="ml">Assenze itinere: gg itin. / gg tot. ×100</p><p class="mv" id="sic-ind-ass-itin">0</p></div>'
+    + '<div class="mc"><p class="ml">Inf. luogo lavoro / tot. ×100</p><p class="mv" id="sic-ind-luogo-pct">0</p></div>'
+    + '<div class="mc"><p class="ml">Assenze luogo: gg luogo / gg tot. ×100</p><p class="mv" id="sic-ind-ass-luogo">0</p></div>'
+    + '<div class="mc"><p class="ml">Ore totali assenza per infortuni</p><p class="mv" id="sic-ind-ore-ass">0</p></div>'
+    + '</div>'
+    + '<hr class="div">'
+    + '<p class="stitle">Malattie professionali &amp; Near Miss</p>'
+    + '<div class="g4">'
+    + '<div class="ig"><label>MP: gg assenza sul lav. / gg tot. perse ×100</label><input type="number" id="sic-mp-gg" placeholder="0" step="0.001" min="0"/></div>'
+    + '<div class="ig"><label>Tasso MP: n°casi / ore lav. ×200.000</label><input type="number" id="sic-mp-tasso" placeholder="0" step="0.001" min="0"/></div>'
+    + '<div class="ig"><label>Near miss: n°segn. / n°dip. medio ×100</label><input type="number" id="sic-nearmiss" placeholder="0" step="0.01" min="0"/></div>'
+    + '</div>';
+}
+
+function calcSicurezzaKPIExt() {
+  var inf = window.infortuni_list || [];
+  var n   = inf.length;
+  var gg  = inf.reduce(function(a, x) { return a + (parseFloat(x.giorni) || 0); }, 0);
+  var nIt = inf.filter(function(x) { return x.tipo === 'itinere'; }).length;
+  var nLu = inf.filter(function(x) { return x.tipo === 'luogo'; }).length;
+  var ggIt = inf.filter(function(x) { return x.tipo === 'itinere'; }).reduce(function(a,x){return a+(parseFloat(x.giorni)||0);},0);
+  var ggLu = inf.filter(function(x) { return x.tipo === 'luogo'; }).reduce(function(a,x){return a+(parseFloat(x.giorni)||0);},0);
+  var ore  = parseFloat((document.getElementById('sic-ore') || {value:52000}).value) || 52000;
+  var emp  = parseFloat((document.getElementById('employees') || {value:25}).value) || 1;
+  var oreAss = gg * 8;
+  var s = function(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+  s('sic-ind-incid',    emp > 0  ? (n / emp * 1000).toFixed(2) : '0');
+  s('sic-ind-grav',     n > 0    ? (gg / n).toFixed(2) : '0');
+  s('sic-ind-sic',      ore > 0  ? (oreAss / ore * 100).toFixed(3) : '0');
+  s('sic-ind-tf',       ore > 0  ? (n / ore * 1000000).toFixed(2) : '0');
+  s('sic-ind-tg',       ore > 0  ? (gg / ore * 1000).toFixed(2) : '0');
+  s('sic-ind-itin-pct', n > 0    ? (nIt / n * 100).toFixed(1) + '%' : '0%');
+  s('sic-ind-ass-itin', gg > 0   ? (ggIt / gg * 100).toFixed(1) + '%' : '0%');
+  s('sic-ind-luogo-pct',n > 0    ? (nLu / n * 100).toFixed(1) + '%' : '0%');
+  s('sic-ind-ass-luogo',gg > 0   ? (ggLu / gg * 100).toFixed(1) + '%' : '0%');
+  s('sic-ind-ore-ass',  oreAss.toLocaleString('it-IT'));
+}
+
+// ── Override fillModuleBody per nuovi moduli ───────────────────────────────
+var _origFillModuleBody = fillModuleBody;
+function fillModuleBody(id, el) {
+  if (id === 'acqua')      { el.innerHTML = buildAcquaHTML();       return; }
+  if (id === 'gasolio_gas'){ el.innerHTML = buildGasolioBenzHTML(); calcCombustibili(); return; }
+  if (id === 'rifiuti')    { el.innerHTML = buildRifiutiHTML();     calcRifiuti();      return; }
+  _origFillModuleBody(id, el);
+  if (id === 'sicurezza') {
+    var extra = document.createElement('div');
+    extra.innerHTML = buildSicurezzaKPIExtHTML();
+    el.appendChild(extra);
+  }
+}
+
+// ── Override calcKPI per aggiungere calcoli extra ─────────────────────────
+var _origCalcKPI = calcKPI;
+function calcKPI() {
+  _origCalcKPI();
+  calcCombustibili();
+  calcRifiuti();
+  calcSicurezzaKPIExt();
+}
+
+// ── MODULES aggiuntivi (inseriti dopo il primo elemento) ─────────────────
+// Chiamato dopo che MODULES è definito, prima di buildModuleGrid
+function addExtraModules() {
+  var hasGas = MODULES.some(function(m) { return m.id === 'gasolio_gas'; });
+  if (!hasGas) {
+    MODULES.splice(1, 0,
+      {id:'gasolio_gas', icon:'🛢️', name:'Gasolio & Gas',     color:'#FFF3E0', desc:'Gas naturale, gasolio, benzina mensile', active:true},
+      {id:'acqua',       icon:'💧', name:'Dati Idrici',        color:'#E3F2FD', desc:'Acqua rete, pozzo, reflui, riuso',       active:true},
+      {id:'rifiuti',     icon:'♻️', name:'Rifiuti & Ambiente', color:'#E8F5E9', desc:'Rifiuti, recupero R, smaltimento D',    active:true}
+    );
+  }
+}
+
+// ── AUTH SYSTEM ────────────────────────────────────────────────────────────
+// Credenziali di primo accesso — uguali per tutti gli utenti
+// Cambiarle qui per distribuire a nuovi utenti
+var AUTH_DEFAULT_USER = 'encomar';
+var AUTH_DEFAULT_PWD  = 'Encomar2025!';
+var AUTH_STORE_KEY    = 'esg_users_v1';
+var AUTH_SESSION_KEY  = 'esg_session_v1';
+
+function authLoadUsers() {
+  try { return JSON.parse(localStorage.getItem(AUTH_STORE_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+function authSaveUsers(u) {
+  try { localStorage.setItem(AUTH_STORE_KEY, JSON.stringify(u)); } catch(e){}
+}
+function authHash(s) {
+  var h = 5381;
+  for (var i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+  return btoa('esg' + (h >>> 0) + s.length);
+}
+function authSessionToken(username) {
+  return authHash(username + (navigator.userAgent || '').slice(0, 20));
+}
+
+function authLogin() {
+  var user = (document.getElementById('login-user').value || '').trim().toLowerCase();
+  var pwd  = document.getElementById('login-pwd').value || '';
+  var err  = document.getElementById('login-err');
+  err.style.display = 'none';
+
+  if (!user || !pwd) {
+    err.textContent = 'Inserisci username e password.';
+    err.style.display = 'block'; return;
+  }
+
+  // Credenziali primo accesso (default)
+  if (user === AUTH_DEFAULT_USER && pwd === AUTH_DEFAULT_PWD) {
+    showChangeScreen(); return;
+  }
+
+  // Utenti registrati
+  var users = authLoadUsers();
+  if (users[user]) {
+    if (users[user].hash === authHash(pwd)) {
+      if (users[user].firstLogin) { showChangeScreen(); return; }
+      authGrantAccess(user); return;
+    }
+  }
+
+  err.textContent = 'Username o password non corretti.';
+  err.style.display = 'block';
+  document.getElementById('login-pwd').value = '';
+  document.getElementById('login-pwd').focus();
+  setTimeout(function(){ err.style.display='none'; }, 4000);
+}
+
+function showChangeScreen() {
+  document.getElementById('auth-login').style.display  = 'none';
+  document.getElementById('auth-change').style.display = 'block';
+  document.getElementById('new-user').focus();
+}
+
+function authChange() {
+  var newUser = (document.getElementById('new-user').value || '').trim().toLowerCase();
+  var newPwd  = document.getElementById('new-pwd').value  || '';
+  var newPwd2 = document.getElementById('new-pwd2').value || '';
+  var err     = document.getElementById('change-err');
+  err.style.display = 'none';
+
+  if (newUser.length < 3 || newUser.indexOf(' ') >= 0) {
+    err.textContent = 'Username non valido (min. 3 caratteri, senza spazi).';
+    err.style.display = 'block'; return;
+  }
+  if (newUser === AUTH_DEFAULT_USER) {
+    err.textContent = 'Non puoi usare il nome utente predefinito di sistema.';
+    err.style.display = 'block'; return;
+  }
+  if (!pwdIsStrong(newPwd)) {
+    err.textContent = 'La password non soddisfa i requisiti minimi.';
+    err.style.display = 'block'; return;
+  }
+  if (newPwd !== newPwd2) {
+    err.textContent = 'Le due password non coincidono.';
+    err.style.display = 'block'; return;
+  }
+
+  var users = authLoadUsers();
+  // Controlla che username non sia già preso da un utente definitivo
+  if (users[newUser] && !users[newUser].firstLogin) {
+    err.textContent = 'Username già in uso. Scegliene un altro.';
+    err.style.display = 'block'; return;
+  }
+
+  users[newUser] = {
+    hash: authHash(newPwd),
+    firstLogin: false,
+    createdAt: new Date().toISOString()
+  };
+  authSaveUsers(users);
+  authGrantAccess(newUser);
+}
+
+function authGrantAccess(username) {
+  try {
+    sessionStorage.setItem(AUTH_SESSION_KEY, authSessionToken(username));
+  } catch(e){}
+  document.getElementById('lock-screen').style.display = 'none';
+}
+
+function pwdIsStrong(p) {
+  return p.length >= 8 &&
+    /[A-Z]/.test(p) && /[0-9]/.test(p) && /[^A-Za-z0-9]/.test(p);
+}
+
+function checkNewPwdStrength() {
+  var p    = document.getElementById('new-pwd').value  || '';
+  var p2   = document.getElementById('new-pwd2').value || '';
+  var user = (document.getElementById('new-user').value || '').trim();
+
+  var rules = [
+    {id:'rule-len',   ok: p.length >= 8,           label:'Almeno 8 caratteri'},
+    {id:'rule-upper', ok: /[A-Z]/.test(p),         label:'Almeno una lettera maiuscola'},
+    {id:'rule-num',   ok: /[0-9]/.test(p),         label:'Almeno un numero'},
+    {id:'rule-sym',   ok: /[^A-Za-z0-9]/.test(p), label:'Almeno un simbolo (!@#$%&*...)'}
+  ];
+  var score = rules.filter(function(r){ return r.ok; }).length;
+
+  rules.forEach(function(r) {
+    var el = document.getElementById(r.id);
+    if (!el) return;
+    el.textContent = (r.ok ? '✅ ' : '○ ') + r.label;
+    el.style.color  = r.ok ? '#3fb950' : '#484f58';
+  });
+
+  var fill  = document.getElementById('pwd-strength-fill');
+  var lbl   = document.getElementById('pwd-strength-label');
+  var cols  = ['#f85149','#f85149','#f0883e','#d2a31e','#3fb950'];
+  var lbls  = ['','Troppo debole','Debole','Discreta','Forte ✓'];
+  if (fill) { fill.style.width = (score*25)+'%'; fill.style.background = cols[score]; }
+  if (lbl)  { lbl.textContent = lbls[score]; lbl.style.color = cols[score]; }
+
+  // Feedback campo conferma
+  var e2 = document.getElementById('new-pwd2');
+  if (e2) e2.style.borderColor = p2.length===0 ? '#30363d' : (p===p2 ? '#3fb950':'#f85149');
+
+  // Abilita/disabilita pulsante
+  var btn = document.getElementById('btn-change');
+  var ok  = score===4 && p===p2 && p2.length>0 && user.length>=3 && user.indexOf(' ')<0;
+  if (btn) {
+    btn.disabled        = !ok;
+    btn.style.background = ok ? '#238636' : '#484f58';
+    btn.style.color      = ok ? '#fff'    : '#8b949e';
+    btn.style.cursor     = ok ? 'pointer' : 'not-allowed';
+  }
+}
+
+// Controlla sessione valida all'avvio
+(function() {
+  try {
+    var stored = sessionStorage.getItem(AUTH_SESSION_KEY);
+    if (!stored) return;
+    var users = authLoadUsers();
+    for (var u in users) {
+      if (!users[u].firstLogin && authSessionToken(u) === stored) {
+        document.getElementById('lock-screen').style.display = 'none';
+        return;
+      }
+    }
+  } catch(e) {}
+})();
+
+// ── PWA ───────────────────────────────────────────────────────────────────
+(function() {
+  var manifest = {
+    name: 'ESG Dashboard ENCOMAR',
+    short_name: 'ESG ENCOMAR',
+    description: 'Dashboard sostenibilità e scadenziario ESG',
+    start_url: '.', display: 'standalone',
+    background_color: '#0F6E56', theme_color: '#0F6E56',
+    icons: [{
+      src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F6E56'/><text y='68' x='50' font-size='55' text-anchor='middle' fill='white'>&#9851;</text></svg>",
+      sizes: '192x192', type: 'image/svg+xml'
+    }]
+  };
+  try {
+    var blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+    var link = document.getElementById('pwa-manifest-link');
+    if (link) link.href = URL.createObjectURL(blob);
+    if ('serviceWorker' in navigator) {
+      var sw = "const C='esg-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['.']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));";
+      var swBlob = new Blob([sw], {type:'application/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob));
+    }
+  } catch(e) { console.log('PWA:', e); }
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MODULES PATCH — inserisce nuovi moduli nella lista
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Aggiungi moduli extra alla lista MODULES ──────────────────────────────
+(function() {
+  var has = function(id) { return MODULES.some(function(m) { return m.id === id; }); };
+  // rimuovi buildIdricoHTML legacy se presente (già rimosso da v5_js_clean)
+  if (!has('gasolio_gas')) MODULES.splice(1, 0,
+    {id:'gasolio_gas', icon:'⛽', name:'Gasolio & Gas',     color:'#FFF3E0',
+     desc:'Gas naturale, gasolio, benzina — mensile', active:true});
+  if (!has('acqua')) MODULES.splice(2, 0,
+    {id:'acqua', icon:'💧', name:'Dati Idrici', color:'#E3F2FD',
+     desc:'Acqua rete, pozzo, reflui, riuso mensile', active:true});
+  if (!has('rifiuti')) MODULES.splice(3, 0,
+    {id:'rifiuti', icon:'♻️', name:'Rifiuti & Ambiente', color:'#E8F5E9',
+     desc:'Rifiuti, recupero R, smaltimento D, indici', active:true});
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// XLSX — Modello Universale
+// ════════════════════════════════════════════════════════════════════════════
+function generateAndDownloadTemplate() {
+  var wb = XLSX.utils.book_new();
+
+  var HDR_GREEN  = "FF0F6E56";
+  var HDR_BLUE   = "FF185FA5";
+  var HDR_AMBER  = "FFBA7517";
+  var HDR_PURPLE = "FF534AB7";
+  var HDR_GRAY   = "FF444441";
+  var WHITE      = "FFFFFFFF";
+  var INPUT_BG   = "FFF5F4F0";
+  var CALC_BG    = "FFEFEFEB";
+  var LIGHT_BLU  = "FFE6F1FB";
+// ── SHEET 1: ISTRUZIONI ──────────────────────────────────────────────
+  var ws_inst = {};
+  var inst_data = [
+    ["MODELLO UNIVERSALE SOSTENIBILITÀ — Istruzioni per la compilazione"],
+    [""],
+    ["STANDARD DI RIFERIMENTO"],
+    ["Questo modello è allineato a:"],
+    ["• VSME (Voluntary Sustainability Reporting Standard for SMEs) – Commissione Europea 2025"],
+    ["• GRI Standards (Global Reporting Initiative)"],
+    ["• ISO 14001 (Ambiente) / ISO 45001 (Sicurezza) / ISO 50001 (Energia)"],
+    ["• D.Lgs. 231/2001 – Modello Organizzativo e di Controllo"],
+    ["• Legge 10/1991 – Energy Manager | D.Lgs. 102/2014 – Diagnosi Energetica"],
+    [""],
+    ["COME COMPILARE"],
+    ["1. Compila SOLO le celle con sfondo bianco/grigio chiaro."],
+    ["2. NON modificare celle azzurre (formule/valori fissi)."],
+    ["3. NON aggiungere o rimuovere righe/colonne: le posizioni sono fisse."],
+    ["4. Usa i menu a tendina dove presenti."],
+    ["5. I campi contrassegnati con * sono OBBLIGATORI."],
+    ["6. Inserisci valori NUMERICI senza unità di misura (es. scrivi 5000, non '5000 kWh')."],
+    ["7. Per campi non applicabili lascia la cella VUOTA (non scrivere 0 o N/A)."],
+    [""],
+    ["STRUTTURA DEL FILE"],
+    ["Foglio 1 — ISTRUZIONI     (questo foglio)"],
+    ["Foglio 2 — ANAGRAFICA     Dati generali azienda e anno di riferimento"],
+    ["Foglio 3 — ENERGIA        Consumi energetici, fonti, rinnovabili, TEP, CO₂"],
+    ["Foglio 4 — AMBIENTE       Rifiuti, acqua, emissioni atmosferiche, mobilità"],
+    ["Foglio 5 — SICUREZZA      Infortuni, formazione, DPI, adempimenti normativi"],
+    ["Foglio 6 — RISORSE_UMANE  Organico, genere, welfare, turnover, assenteismo"],
+    ["Foglio 7 — GOVERNANCE     Certificazioni, audit, compliance, etica, supply chain"],
+    [""],
+    ["AVVERTENZA"],
+    ["Questo file è protetto. Non modificare la struttura. Password: sostenibilita2025"],
+    ["Per assistenza contattare il responsabile del sistema."]
+  ];
+  inst_data.forEach(function(row, ri) {
+    var isSec = row[0] && (row[0] === "STANDARD DI RIFERIMENTO" || row[0] === "COME COMPILARE" || row[0] === "STRUTTURA DEL FILE" || row[0] === "AVVERTENZA");
+    var isTitle = ri === 0;
+    var cell = {
+      v: row[0] || '', t: 's',
+      s: {
+        font: { name:"Arial", sz: isTitle?13:(isSec?10:10), bold: isTitle||isSec,
+                color:{ rgb: isTitle||isSec ? WHITE : "FF1A1A18" } },
+        fill: { fgColor:{ rgb: isTitle ? HDR_GREEN : (isSec ? HDR_BLUE : "FFFFFFFF") }, patternType:"solid" },
+        alignment: { horizontal:"left", vertical:"center", wrapText:true }
+      }
+    };
+    ws_inst[XLSX.utils.encode_cell({r:ri,c:0})] = cell;
+  });
+  ws_inst['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:inst_data.length,c:0}});
+  ws_inst['!cols'] = [{wch:85}];
+  ws_inst['!rows'] = Array(inst_data.length).fill({hpt:17});
+  ws_inst['!rows'][0] = {hpt:30};
+  XLSX.utils.book_append_sheet(wb, ws_inst, "ISTRUZIONI");
+
+  // ── SHEET 2: ANAGRAFICA ──────────────────────────────────────────────
+  var ws_ana = {};
+  var ana_rows = [
+    [hdr("ANAGRAFICA AZIENDA", HDR_GREEN)],
+    [],
+    [hdr("DATI IDENTIFICATIVI", HDR_BLUE)],
+    [mkCell("* Ragione Sociale",{bold:true}),     mkCell(null,{bg:INPUT_BG})],
+    [mkCell("* Codice Fiscale / P. IVA",{bold:true}), mkCell(null,{bg:INPUT_BG})],
+    [mkCell("* Sede Legale (Comune, Prov.)",{bold:true}), mkCell(null,{bg:INPUT_BG})],
+    [mkCell("* Settore NACE",{bold:true}),        mkCell(null,{bg:INPUT_BG})],
+    [mkCell("* Codice NACE (es. C22.19)",{bold:true}), mkCell(null,{bg:INPUT_BG})],
+    [mkCell("* Anno di riferimento",{bold:true}), mkCell(null,{bg:INPUT_BG,numFmt:"0000"})],
+    [mkCell("* N° dipendenti (media annua)",{bold:true}), mkCell(null,{bg:INPUT_BG,numFmt:"#,##0"})],
+    [mkCell("* Fatturato (€)",{bold:true}),       mkCell(null,{bg:INPUT_BG,numFmt:"#,##0.00"})],
+    [mkCell("N° siti produttivi"),                mkCell(null,{bg:INPUT_BG,numFmt:"#,##0"})],
+    [mkCell("Certificazioni possedute"),          mkCell(null,{bg:INPUT_BG})],
+    [],
+    [hdr("REFERENTE COMPILAZIONE", HDR_BLUE)],
+    [mkCell("Nome Referente"),  mkCell(null,{bg:INPUT_BG})],
+    [mkCell("Ruolo / Funzione"),mkCell(null,{bg:INPUT_BG})],
+    [mkCell("Email"),           mkCell(null,{bg:INPUT_BG})],
+    [mkCell("Data compilazione"),mkCell(null,{bg:INPUT_BG,numFmt:"DD/MM/YYYY"})],
+    [],
+    [hdr("PERIMETRO DI RENDICONTAZIONE", HDR_BLUE)],
+    [mkCell("Perimetro (es. sede principale, gruppo…)"), mkCell(null,{bg:INPUT_BG})],
+    [mkCell("Principio di consolidamento"),       mkCell(null,{bg:INPUT_BG})],
+    [mkCell("Standard di riferimento"),           mkCell(null,{bg:INPUT_BG})],
+  ];
+  var anaRef = {s:{r:0,c:0},e:{r:ana_rows.length,c:3}};
+  ws_ana['!ref'] = XLSX.utils.encode_range(anaRef);
+  ws_ana['!merges'] = [{s:{r:0,c:0},e:{r:0,c:3}},{s:{r:2,c:0},e:{r:2,c:3}},{s:{r:14,c:0},e:{r:14,c:3}},{s:{r:20,c:0},e:{r:20,c:3}}];
+  ana_rows.forEach(function(row,ri){
+    row.forEach(function(cell,ci){
+      if(cell) ws_ana[XLSX.utils.encode_cell({r:ri,c:ci})] = cell;
+    });
+  });
+  ws_ana['!cols'] = [{wch:38},{wch:35},{wch:15},{wch:15}];
+  ws_ana['!rows'] = Array(ana_rows.length).fill({hpt:18});
+  ws_ana['!rows'][0] = {hpt:30};
+  XLSX.utils.book_append_sheet(wb, ws_ana, "ANAGRAFICA");
+
+  // ── SHEET 3: ENERGIA ─────────────────────────────────────────────────
+  var en_rows = [
+    secRow("── CONSUMI DA RETE ──", HDR_GRAY),
+    dataRow("Energia elettrica da rete","Bolletta/contatore","kWh",true),
+    dataRow("Gas naturale","Bolletta","Sm³",true),
+    dataRow("Gasolio (automezzi + macchinari)","Report accise","L",true),
+    dataRow("Benzina","Report accise","L",false),
+    dataRow("GPL","Bolletta/accise","L",false),
+    dataRow("Vapore acquistato","Bolletta","MWh",false),
+    dataRow("Teleriscaldamento","Bolletta","MWh",false),
+    secRow("── FONTI RINNOVABILI ──", HDR_GRAY),
+    dataRow("kWh prodotti da fotovoltaico","GSE/inverter","kWh",true),
+    dataRow("kWh autoconsumati da fotovoltaico","GSE","kWh",true),
+    dataRow("kWh immessi in rete da FV","GSE","kWh",false),
+    dataRow("Energia da altre rinnovabili (eolico, idro…)","Contratto","kWh",false),
+    secRow("── TOTALI E KPI (inserire se non calcolati dal sistema) ──", HDR_BLUE),
+    dataRow("Consumo totale energia (kWh equiv.)","=SOMMA consumi","kWh",true),
+    dataRow("TOE / TEP totali","kWh×0,0000860","TEP",false),
+    dataRow("% energia da rinnovabili","=FV/totale","%",true),
+    dataRow("Intensità energetica (kWh/€ fatt.)","=kWh/fatturato","kWh/€",false),
+    dataRow("Intensità energetica (kWh/dipend.)","=kWh/n°dip","kWh/dip",false),
+    secRow("── EMISSIONI CO₂ ──", HDR_GRAY),
+    dataRow("CO₂eq da energia elettrica (Scope 2)","kWh×0,233","ton",true),
+    dataRow("CO₂eq da gas naturale (Scope 1)","Sm³×0,00202","ton",false),
+    dataRow("CO₂eq da gasolio (Scope 1)","L×0,00271","ton",false),
+    dataRow("CO₂eq totale (Scope 1+2)","=somma","ton",true),
+    dataRow("CO₂ evitata da fotovoltaico","kWhFV×0,000530","ton",false),
+    secRow("── SOGLIE NORMATIVE ──", HDR_GRAY),
+    dataRow("Consumi totali in GWh (soglia 1 GWh)","=kWh÷1.000.000","GWh",false),
+    dataRow("Obbligo Energy Manager? (>1000 TEP)","=SE(TEP>1000;Sì;No)","Sì/No",false),
+    dataRow("Obbligo diagnosi energetica (>10 GWh)?","=SE(GWh>10;Sì;No)","Sì/No",false),
+    dataRow("km percorsi automezzi aziendali","Report fleet mgmt","km",false),
+  ];
+  addSheet("ENERGIA","ENERGIA — Consumi energetici, fonti rinnovabili, conversioni, CO₂",
+           HDR_GREEN,[40,28,14,14,14,14,20], en_rows);
+
+  // ── SHEET 4: AMBIENTE ────────────────────────────────────────────────
+  var amb_rows = [
+    secRow("── RIFIUTI PRODOTTI (autoprodotti) ──", HDR_GRAY),
+    dataRow("Rifiuti pericolosi prodotti","MUD/registro","ton",true),
+    dataRow("Rifiuti non pericolosi prodotti","MUD/registro","ton",true),
+    dataRow("Rifiuti totali prodotti","=RP+RNP","ton",true),
+    dataRow("% rifiuti pericolosi su totale","=RP/tot","%",false),
+    secRow("── RIFIUTI GESTITI / TRATTATI ──", HDR_GRAY),
+    dataRow("Rifiuti avviati a recupero (R)","MUD","ton",true),
+    dataRow("Rifiuti avviati a smaltimento (D)","MUD","ton",true),
+    dataRow("% recupero su totale","=R/tot","%",true),
+    dataRow("Sovvallo / scarti di lavorazione","MUD/registro","ton",false),
+    dataRow("% sovvallo su rifiuto trattato","=sovv/trattato","%",false),
+    dataRow("EoW prodotti (End of Waste)","MUD","ton",false),
+    secRow("── RIFIUTI IN INGRESSO (se applicabile) ──", HDR_GRAY),
+    dataRow("Rifiuti in ingresso R13","MUD","ton",false),
+    dataRow("Rifiuti in ingresso R12","MUD","ton",false),
+    dataRow("Rifiuti in ingresso R4","MUD","ton",false),
+    dataRow("Rifiuti in ingresso D15","MUD","ton",false),
+    secRow("── ACQUA ──", "FF0F6E56"),
+    dataRow("Acqua prelevata da rete idrica","Bolletta/contatore","m³",true),
+    dataRow("Acqua prelevata da pozzo/falda","Licenza/misura","m³",false),
+    dataRow("Acqua scaricata (reflui)","Mod.15/misura","m³",true),
+    dataRow("Acqua riciclata/riutilizzata","Misura interna","m³",false),
+    dataRow("Costi impianto depurazione","Contabilità","€",false),
+    secRow("── EMISSIONI ATMOSFERICHE ──", HDR_GRAY),
+    dataRow("CO₂eq Scope 1 totale","Calcolo/misura","ton CO₂eq",true),
+    dataRow("CO₂eq Scope 2 totale","Fatture EE","ton CO₂eq",true),
+    dataRow("NOx emessi","AIA/autorizzazione","kg",false),
+    dataRow("SOx emessi","AIA/autorizzazione","kg",false),
+    dataRow("Polveri/PM emesse","AIA/autorizzazione","kg",false),
+    dataRow("N° autorizzazioni emissioni in atmosfera","Registro AIA","n°",false),
+    secRow("── MOBILITÀ ──", HDR_BLUE),
+    dataRow("km percorsi automezzi aziendali","Fleet manager","km",true),
+    dataRow("Consumo gasolio automezzi (L)","Fleet manager","L",true),
+    dataRow("CO₂eq da flotta aziendale","L×2,61/1000","ton",false),
+    dataRow("km in treno (trasferte)","Note spese","km",false),
+    dataRow("CO₂ risparmiata vs auto privata","Calcolo ISPRA","ton",false),
+    secRow("── BIODIVERSITÀ ──", "FF0F6E56"),
+    dataRow("Superficie siti in aree protette (ha)","Catasto/mappa","ha",false),
+    dataRow("N° interventi tutela biodiversità","Registro interno","n°",false),
+  ];
+  addSheet("AMBIENTE","AMBIENTE — Rifiuti, Acqua, Emissioni atmosferiche, Mobilità, Biodiversità",
+           HDR_GREEN,[40,28,14,14,14,14,20], amb_rows);
+
+  // ── SHEET 5: SICUREZZA ───────────────────────────────────────────────
+  var sic_rows = [
+    secRow("── INFORTUNI ──", HDR_GRAY),
+    dataRow("N° infortuni totali","INAIL/registro","n°",true),
+    dataRow("N° infortuni sul luogo di lavoro","INAIL","n°",true),
+    dataRow("N° infortuni in itinere","INAIL","n°",true),
+    dataRow("Giorni totali assenza per infortunio","Registro HR","gg",true),
+    dataRow("N° infortuni mortali","INAIL","n°",true),
+    dataRow("Ore totali lavorate","Cedolini/HR","ore",true),
+    dataRow("Incidenza infortuni (×1000 dip.)","=n°inf/dip×1000","‰",true),
+    dataRow("Gravità infortuni","=gg/n°inf","gg/inf",true),
+    dataRow("Tasso frequenza (×1.000.000 ore)","=n°/ore×1.000.000","TF",true),
+    dataRow("Tasso gravità (×1.000 ore)","=gg/ore×1000","TG",true),
+    secRow("── FORMAZIONE SICUREZZA ──", HDR_GRAY),
+    dataRow("Ore formazione sicurezza erogate","Registro formaz.","ore",true),
+    dataRow("Ore formazione previste","Piano formaz.","ore",true),
+    dataRow("% completamento formazione","=erogate/previste","%",true),
+    dataRow("Ore formazione lavoratori","Registro","ore",false),
+    dataRow("Ore formazione preposti","Registro","ore",false),
+    dataRow("Ore formazione dirigenti","Registro","ore",false),
+    dataRow("N° lavoratori formati entro 60gg assunzione","Registro","n°",false),
+    dataRow("N° aggiornamenti periodici evasi nei tempi","Registro","n°",false),
+    secRow("── SORVEGLIANZA SANITARIA ──", HDR_GRAY),
+    dataRow("N° visite mediche eseguite","Medico comp.","n°",true),
+    dataRow("N° lavoratori idonei con prescrizioni","Medico comp.","n°",false),
+    dataRow("N° lavoratori non idonei","Medico comp.","n°",false),
+    secRow("── DPI E NON CONFORMITÀ ──", HDR_GRAY),
+    dataRow("Costo totale DPI (€)","Contabilità","€",false),
+    dataRow("N° tipologie DPI in uso","Registro DPI","n°",false),
+    dataRow("N° non conformità sicurezza rilevate","Audit/ispezioni","n°",false),
+    dataRow("N° NC chiuse entro scadenza","Registro NC","n°",false),
+    secRow("── ADEMPIMENTI NORMATIVI ──", HDR_GRAY),
+    dataRow("DVR redatto/aggiornato (1=Sì, 0=No)","DVR","1/0",true),
+    dataRow("Valutazione Stress lavoro-correlato (1=Sì)","DVR","1/0",false),
+    dataRow("Piano Emergenza aggiornato (1=Sì)","Piano emerg.","1/0",true),
+    dataRow("Modello 231 adottato (1=Sì)","CdA","1/0",true),
+    dataRow("N° ispezioni/audit esterni subiti","Verbali","n°",false),
+    dataRow("N° sanzioni/prescrizioni ricevute","Verbali","n°",false),
+    dataRow("N° RLS (Rappresentanti Lavoratori Sic.)","Verbale elez.","n°",true),
+    dataRow("N° riunioni periodiche sicurezza","Verbali riunioni","n°",true),
+  ];
+  addSheet("SICUREZZA","SICUREZZA — Infortuni, Formazione, DPI, Adempimenti normativi",
+           HDR_GRAY,[42,28,14,14,14,14,20], sic_rows);
+
+  // ── SHEET 6: RISORSE UMANE ───────────────────────────────────────────
+  var hr_rows = [
+    secRow("── ORGANICO ──", HDR_AMBER),
+    dataRow("N° dipendenti totali (media annua)","LUL/HR","n°",true),
+    dataRow("N° dipendenti a tempo indeterminato","LUL","n°",true),
+    dataRow("N° dipendenti a tempo determinato","LUL","n°",true),
+    dataRow("N° dipendenti part-time","LUL","n°",false),
+    dataRow("N° lavoratori interinali/somministrati","Agenzia","n°",false),
+    dataRow("N° collaboratori/autonomi","Registro","n°",false),
+    secRow("── GENERE E DIVERSITÀ ──", HDR_AMBER),
+    dataRow("N° donne totali","LUL/HR","n°",true),
+    dataRow("N° uomini totali","LUL/HR","n°",true),
+    dataRow("% donne sul totale","=F/tot","%",true),
+    dataRow("N° donne in posizioni di leadership","Organigramma","n°",true),
+    dataRow("% donne in leadership","=F_lead/lead_tot","%",true),
+    dataRow("N° lavoratori under 30","HR","n°",false),
+    dataRow("N° lavoratori over 50","HR","n°",false),
+    dataRow("N° lavoratori con disabilità","HR","n°",false),
+    dataRow("N° nazionalità diverse presenti","HR","n°",false),
+    secRow("── RETRIBUZIONE E WELFARE ──", HDR_AMBER),
+    dataRow("Retribuzione media annua lorda (€)","LUL","€",true),
+    dataRow("Retribuzione media donne (€)","LUL","€",false),
+    dataRow("Retribuzione media uomini (€)","LUL","€",false),
+    dataRow("Gap retributivo di genere (%)","=(Rm-Rf)/Rm","%",true),
+    dataRow("CCNL applicato","LUL/HR","testo",false),
+    dataRow("N° benefit welfare erogati","Registro HR","n°",false),
+    dataRow("Spesa welfare aziendale (€)","Contabilità","€",false),
+    secRow("── FORMAZIONE TOTALE ──", HDR_AMBER),
+    dataRow("Ore totali formazione erogate","Registro formaz.","ore",true),
+    dataRow("Ore formazione per dipendente","=tot/n°dip","ore/dip",true),
+    dataRow("Spesa formazione (€)","Contabilità","€",false),
+    secRow("── TURNOVER ──", HDR_AMBER),
+    dataRow("N° assunzioni nell'anno","HR","n°",true),
+    dataRow("N° uscite nell'anno","HR","n°",true),
+    dataRow("Tasso di turnover (%)","=(ass+usc)/2/dip","%",true),
+    dataRow("N° promozioni interne","HR","n°",false),
+    secRow("── ASSENTEISMO ──", HDR_AMBER),
+    dataRow("N° ore di assenza totali","Cedolini","ore",true),
+    dataRow("Tasso di assenteismo (%)","=ore_ass/ore_lav","%",true),
+    dataRow("N° ore straordinario","Cedolini","ore",false),
+  ];
+  addSheet("RISORSE_UMANE","RISORSE UMANE — Organico, Genere, Welfare, Diversità, Turnover, Assenteismo",
+           HDR_AMBER,[42,28,14,14,14,14,20], hr_rows);
+
+  // ── SHEET 7: GOVERNANCE ──────────────────────────────────────────────
+  var gov_rows = [
+    secRow("── CERTIFICAZIONI ──", HDR_PURPLE),
+    dataRow("ISO 9001 Qualità (1=Sì, 0=No)","Certificato","1/0",true),
+    dataRow("ISO 14001 Ambiente (1=Sì, 0=No)","Certificato","1/0",true),
+    dataRow("ISO 45001 Sicurezza (1=Sì, 0=No)","Certificato","1/0",true),
+    dataRow("ISO 50001 Energia (1=Sì, 0=No)","Certificato","1/0",false),
+    dataRow("SA8000 Responsabilità Sociale (1=Sì)","Certificato","1/0",false),
+    dataRow("Altre certificazioni","Registro cert.","testo",false),
+    secRow("── AUDIT E CONTROLLO ──", HDR_PURPLE),
+    dataRow("N° audit interni eseguiti","Registro audit","n°",true),
+    dataRow("N° audit esterni subiti","Registro audit","n°",true),
+    dataRow("N° non conformità rilevate in audit","Registro NC","n°",true),
+    dataRow("N° NC chiuse nei tempi","Registro NC","n°",true),
+    dataRow("% NC chiuse nei tempi","=chiuse/tot","%",true),
+    dataRow("N° azioni correttive aperte","Registro AC","n°",false),
+    secRow("── COMPLIANCE E ANTICORRUZIONE ──", HDR_PURPLE),
+    dataRow("Modello Organizzativo 231 adottato (1=Sì)","Delibera CdA","1/0",true),
+    dataRow("Codice Etico adottato (1=Sì)","Delibera CdA","1/0",true),
+    dataRow("Politica Anticorruzione adottata (1=Sì)","Delibera CdA","1/0",true),
+    dataRow("Whistleblowing attivo (1=Sì)","Delibera CdA","1/0",true),
+    dataRow("N° segnalazioni whistleblowing ricevute","OdV/Legale","n°",false),
+    dataRow("N° procedimenti legali/contenziosi","Legale","n°",false),
+    dataRow("N° sanzioni amministrative ricevute","Legale/amm.","n°",false),
+    dataRow("Importo sanzioni (€)","Contabilità","€",false),
+    secRow("── GOVERNANCE SOCIETARIA ──", HDR_PURPLE),
+    dataRow("N° componenti CdA / organo amministrat.","Statuto/visura","n°",true),
+    dataRow("N° donne nel CdA","Visura","n°",true),
+    dataRow("% donne nel CdA","=F_CdA/tot_CdA","%",true),
+    dataRow("N° componenti indipendenti CdA","Statuto","n°",false),
+    dataRow("N° riunioni CdA nell'anno","Verbali CdA","n°",false),
+    secRow("── SUPPLY CHAIN ──", HDR_PURPLE),
+    dataRow("N° fornitori attivi","ERP/anagrafica","n°",true),
+    dataRow("N° fornitori valutati su criteri ESG","Audit fornitori","n°",true),
+    dataRow("% fornitori valutati su ESG","=val/tot","%",true),
+    dataRow("N° fornitori critici identificati","Audit fornitori","n°",false),
+    dataRow("Spesa fornitori locali (entro 100km) €","ERP","€",false),
+    secRow("── TRASPARENZA E REPORT ──", HDR_PURPLE),
+    dataRow("Bilancio di sostenibilità pubblicato (1=Sì)","Documento pub.","1/0",true),
+    dataRow("Anno prima pubblicazione","Archivio","anno",false),
+    dataRow("Standard usato per il report","Documento","testo",true),
+    dataRow("Validazione esterna (assurance) (1=Sì)","Relazione est.","1/0",true),
+  ];
+  addSheet("GOVERNANCE","GOVERNANCE — Certificazioni, Audit, Compliance, Etica, Supply Chain",
+           HDR_PURPLE,[42,28,14,14,14,14,20], gov_rows);
+
+  XLSX.writeFile(wb, "Modello_Sostenibilita_Universale.xlsx");
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+window.onload = function() {
+  buildModuleGrid();
+  buildDataPanel();
+  buildTargetRows();
+  calcKPI();
+};
+
+</script>
+</body>
+</html>
